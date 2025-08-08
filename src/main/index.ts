@@ -6,9 +6,10 @@ import icon from '../../resources/icon.png?asset'
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
+    width: 1200,
+    height: 700,
     show: false,
+    frame: false,
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
@@ -72,3 +73,27 @@ app.on('window-all-closed', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+
+// Handle window control actions from the renderer (Titlebar)
+ipcMain.on('window-control', (event, action: 'minimize' | 'maximize' | 'close') => {
+  const win = BrowserWindow.fromWebContents(event.sender)
+  if (!win) return
+
+  switch (action) {
+    case 'minimize':
+      win.minimize()
+      break
+    case 'maximize':
+      if (win.isMaximized()) {
+        win.unmaximize()
+      } else {
+        win.maximize()
+      }
+      break
+    case 'close':
+      win.close()
+      break
+    default:
+      break
+  }
+})
