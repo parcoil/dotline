@@ -4,6 +4,11 @@
 
 @custom-variant dark (&:is(.dark *));
 
+* {
+  user-select: none;
+  scrollbar-color: var(--primary) var(--background);
+}
+
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.1408 0.0044 285.8229);

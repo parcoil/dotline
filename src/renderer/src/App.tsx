@@ -1,10 +1,14 @@
 import { useEffect, useState } from 'react'
-import { HashRouter as Router, Routes, Route } from 'react-router'
-import { Crosshair } from './components/Crosshair'
-import type { CrosshairConfig } from './types/crosshair'
-import { defaultConfig } from './types/crosshair'
+import { Routes, Route } from 'react-router'
+import { Crosshair } from '@/components/crosshair'
+import type { CrosshairConfig } from '@/types/crosshair'
+import { defaultConfig } from '@/types/crosshair'
+import Editor from '@/pages/editor'
+import Discover from '@/pages/discover'
+import Titlebar from './components/Titlebar'
+import Sidebar from './components/sidebar'
+import Positioning from './pages/positioning'
 import Settings from './pages/settings'
-import Discover from './pages/discover'
 
 function Overlay() {
   const [config, setConfig] = useState<CrosshairConfig>(defaultConfig)
@@ -32,12 +36,20 @@ function Overlay() {
 
 function RoutedApp() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Settings />} />
-        <Route path="/discover" element={<Discover />} />
-      </Routes>
-    </Router>
+    <div className="flex flex-col h-screen">
+      <Titlebar />
+      <div className="flex flex-1 overflow-hidden">
+        <Sidebar />
+        <main className="flex-1 overflow-auto p-4">
+          <Routes>
+            <Route path="/" element={<Discover />} />
+            <Route path="/positioning" element={<Positioning />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/editor" element={<Editor />} />
+          </Routes>
+        </main>
+      </div>
+    </div>
   )
 }
 
