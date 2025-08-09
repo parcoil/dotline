@@ -2,6 +2,7 @@ import { app, shell, BrowserWindow, ipcMain, screen } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import { createAppTray, notifyMinimizedToTrayOnce } from './tray'
 
 type CrosshairConfig = {
   enabled: boolean
@@ -34,6 +35,14 @@ function createSettingsWindow(): void {
 
   settingsWindow.on('ready-to-show', () => {
     settingsWindow?.show()
+  })
+
+  // Intercept close to hide to tray instead of quitting
+  settingsWindow.on('close', (e) => {
+    // Hide to tray instead of closing the app
+    e.preventDefault()
+    settingsWindow?.hide()
+    notifyMinimizedToTrayOnce()
   })
 
   settingsWindow.webContents.setWindowOpenHandler((details) => {
@@ -111,6 +120,12 @@ app.whenReady().then(() => {
 
   createSettingsWindow()
   createOverlayWindow()
+
+  // Create tray to manage reopening after window hidden
+  createAppTray({
+    getMainWindow: () => settingsWindow,
+    createMainWindow: () => createSettingsWindow()
+  })
 
   // Overlay will initialize itself from localStorage; we only forward updates via IPC
 

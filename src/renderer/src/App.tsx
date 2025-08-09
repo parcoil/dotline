@@ -10,7 +10,7 @@ import type { CrosshairConfig } from './types/crosshair'
 
 const defaultConfig: CrosshairConfig = {
   enabled: true,
-  color: '#39FF14',
+  color: '#22C55E',
   opacity: 1,
   thickness: 2,
   length: 5,
