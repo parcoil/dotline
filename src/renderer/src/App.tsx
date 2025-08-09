@@ -25,8 +25,8 @@ function Overlay() {
     const savedRaw = localStorage.getItem('currentConfig')
     if (savedRaw) {
       try {
-        const saved = JSON.parse(savedRaw) as CrosshairConfig
-        setConfig(saved)
+        const saved = JSON.parse(savedRaw) as Partial<CrosshairConfig>
+        setConfig({ ...defaultConfig, ...saved })
       } catch {}
     }
   }, [])

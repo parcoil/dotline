@@ -1,13 +1,19 @@
 import { useState, useEffect } from 'react'
 import { CrosshairConfig } from '../types/crosshair'
 import { Label } from '../components/ui/label'
-import { Checkbox } from '../components/ui/checkbox'
 import { Input } from '../components/ui/input'
 import { Slider } from '../components/ui/slider'
 import { Button } from '../components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card'
 import { defaultConfig } from '../types/crosshair'
 import { Switch } from '@/components/ui/switch'
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue
+} from '@/components/ui/select'
 
 function Editor() {
   const [config, setConfig] = useState<CrosshairConfig>(defaultConfig)
@@ -16,9 +22,10 @@ function Editor() {
     const savedRaw = localStorage.getItem('currentConfig')
     if (savedRaw) {
       try {
-        const saved = JSON.parse(savedRaw) as CrosshairConfig
-        setConfig(saved)
-        window.electron.ipcRenderer.invoke('overlay:update-config', saved)
+        const saved = JSON.parse(savedRaw) as Partial<CrosshairConfig>
+        const merged = { ...defaultConfig, ...saved }
+        setConfig(merged)
+        window.electron.ipcRenderer.invoke('overlay:update-config', merged)
       } catch {}
     }
   }, [])
@@ -36,6 +43,19 @@ function Editor() {
     await window.electron.ipcRenderer.invoke('overlay:update-config', config)
   }
 
+  const handleExport = async () => {
+    await window.electron.ipcRenderer.invoke('config:export', config)
+  }
+
+  const handleImport = async () => {
+    const imported = await window.electron.ipcRenderer.invoke('config:import')
+    if (imported) {
+      setConfig(imported as CrosshairConfig)
+      localStorage.setItem('currentConfig', JSON.stringify(imported))
+      await window.electron.ipcRenderer.invoke('overlay:update-config', imported as CrosshairConfig)
+    }
+  }
+
   return (
     <div className=" max-w-lg mx-auto space-y-4">
       <Card>
@@ -45,10 +65,25 @@ function Editor() {
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <Label>Enabled</Label>
-            <Checkbox
+            <Switch
               checked={config.enabled}
               onCheckedChange={(checked) => handleChange('enabled', !!checked)}
             />
+          </div>
+
+          <div className="flex items-center justify-between gap-4">
+            <Label>Style</Label>
+            <Select value={config.style} onValueChange={(v) => handleChange('style', v as any)}>
+              <SelectTrigger className="w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="classic">Classic</SelectItem>
+                <SelectItem value="dot">Dot</SelectItem>
+                <SelectItem value="circle">Circle</SelectItem>
+                <SelectItem value="x">X</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div>
@@ -135,9 +170,17 @@ function Editor() {
         </CardContent>
       </Card>
 
-      <Button onClick={save} className="w-full h-11 text-lg">
-        Save Crosshair
-      </Button>
+      <div className="grid grid-cols-3 gap-2">
+        <Button onClick={handleImport} variant="outline" size="sm">
+          Import
+        </Button>
+        <Button onClick={handleExport} variant="outline" size="sm">
+          Export
+        </Button>
+        <Button onClick={save} size="sm">
+          Save
+        </Button>
+      </div>
     </div>
   )
 }

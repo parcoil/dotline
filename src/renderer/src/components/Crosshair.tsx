@@ -16,7 +16,7 @@ export function Crosshair({ config }: { config: CrosshairConfig }) {
   const colorWithOpacity = hexToRgba(config.color, config.opacity)
 
   // Calculate center
-  const size = (config.length + config.gap) * 2 + config.thickness * 2
+  const size = Math.max((config.length + config.gap) * 2 + config.thickness * 2, 64)
   const center = size / 2
 
   return (
@@ -31,40 +31,103 @@ export function Crosshair({ config }: { config: CrosshairConfig }) {
           transform: 'translate(-50%, -50%)'
         }}
       >
-        {/* Horizontal left line */}
-        <rect
-          x={center - config.gap - config.length}
-          y={center - config.thickness / 2}
-          width={config.length}
-          height={config.thickness}
-          fill={colorWithOpacity}
-        />
-        {/* Horizontal right line */}
-        <rect
-          x={center + config.gap}
-          y={center - config.thickness / 2}
-          width={config.length}
-          height={config.thickness}
-          fill={colorWithOpacity}
-        />
-        {/* Vertical top line */}
-        <rect
-          x={center - config.thickness / 2}
-          y={center - config.gap - config.length}
-          width={config.thickness}
-          height={config.length}
-          fill={colorWithOpacity}
-        />
-        {/* Vertical bottom line */}
-        <rect
-          x={center - config.thickness / 2}
-          y={center + config.gap}
-          width={config.thickness}
-          height={config.length}
-          fill={colorWithOpacity}
-        />
+        {config.style === 'classic' && (
+          <>
+            <rect
+              x={center - config.gap - config.length}
+              y={center - config.thickness / 2}
+              width={config.length}
+              height={config.thickness}
+              fill={colorWithOpacity}
+            />
+            <rect
+              x={center + config.gap}
+              y={center - config.thickness / 2}
+              width={config.length}
+              height={config.thickness}
+              fill={colorWithOpacity}
+            />
+            <rect
+              x={center - config.thickness / 2}
+              y={center - config.gap - config.length}
+              width={config.thickness}
+              height={config.length}
+              fill={colorWithOpacity}
+            />
+            <rect
+              x={center - config.thickness / 2}
+              y={center + config.gap}
+              width={config.thickness}
+              height={config.length}
+              fill={colorWithOpacity}
+            />
+          </>
+        )}
+
+        {config.style === 'dot' && (
+          <circle
+            cx={center}
+            cy={center}
+            r={Math.max(1, config.thickness)}
+            fill={colorWithOpacity}
+          />
+        )}
+
+        {config.style === 'circle' && (
+          <circle
+            cx={center}
+            cy={center}
+            r={config.gap + Math.max(2, config.length)}
+            stroke={colorWithOpacity}
+            strokeWidth={config.thickness}
+            fill="none"
+          />
+        )}
+
+        {config.style === 'x' && (
+          <>
+            <rect
+              x={center - config.thickness / 2}
+              y={center - config.length - config.gap}
+              width={config.thickness}
+              height={config.length}
+              transform={`rotate(45 ${center} ${center})`}
+              fill={colorWithOpacity}
+            />
+            <rect
+              x={center - config.thickness / 2}
+              y={center + config.gap}
+              width={config.thickness}
+              height={config.length}
+              transform={`rotate(45 ${center} ${center})`}
+              fill={colorWithOpacity}
+            />
+            <rect
+              x={center - config.thickness / 2}
+              y={center - config.length - config.gap}
+              width={config.thickness}
+              height={config.length}
+              transform={`rotate(-45 ${center} ${center})`}
+              fill={colorWithOpacity}
+            />
+            <rect
+              x={center - config.thickness / 2}
+              y={center + config.gap}
+              width={config.thickness}
+              height={config.length}
+              transform={`rotate(-45 ${center} ${center})`}
+              fill={colorWithOpacity}
+            />
+          </>
+        )}
+
         {config.centerDot && (
-          <circle cx={center} cy={center} r={config.thickness} fill={colorWithOpacity} />
+          <circle
+            cx={center}
+            cy={center}
+            r={Math.max(1, config.thickness / 2)}
+            fill={colorWithOpacity}
+          />
         )}
       </svg>
     </div>

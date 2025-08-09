@@ -1,11 +1,16 @@
-import { app, shell, BrowserWindow, ipcMain, screen } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, screen, dialog } from 'electron'
+import type { SaveDialogOptions, OpenDialogOptions } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { createAppTray, notifyMinimizedToTrayOnce } from './tray'
+import { promises as fs } from 'fs'
+
+type CrosshairStyle = 'classic' | 'dot' | 'circle' | 'x'
 
 type CrosshairConfig = {
   enabled: boolean
+  style: CrosshairStyle
   color: string
   opacity: number
   thickness: number
@@ -190,4 +195,65 @@ ipcMain.handle('overlay:update-config', (_event, config: CrosshairConfig) => {
   // Forward to overlay
   overlayWindow?.webContents.send('overlay:config', config)
   return true
+})
+
+// Import/Export configuration handlers
+ipcMain.handle('config:export', async (_event, config: CrosshairConfig) => {
+  const options: SaveDialogOptions = {
+    title: 'Export Crosshair Config',
+    filters: [{ name: 'JSON Files', extensions: ['json'] }],
+    defaultPath: 'crosshair.json'
+  }
+  const result = settingsWindow
+    ? await dialog.showSaveDialog(settingsWindow, options)
+    : await dialog.showSaveDialog(options)
+  if (result.canceled || !result.filePath) return false
+  await fs.writeFile(result.filePath, JSON.stringify(config, null, 2), 'utf-8')
+  return true
+})
+
+ipcMain.handle('config:import', async () => {
+  const options: OpenDialogOptions = {
+    title: 'Import Crosshair Config',
+    properties: ['openFile'],
+    filters: [{ name: 'JSON Files', extensions: ['json'] }]
+  }
+  const result = settingsWindow
+    ? await dialog.showOpenDialog(settingsWindow, options)
+    : await dialog.showOpenDialog(options)
+  if (result.canceled || result.filePaths.length === 0) return null
+  try {
+    const raw = await fs.readFile(result.filePaths[0], 'utf-8')
+    const parsed = JSON.parse(raw)
+    // Basic validation with fallback for style
+    if (typeof parsed !== 'object' || parsed === null) return null
+    const allowedStyles: CrosshairStyle[] = ['classic', 'dot', 'circle', 'x']
+    const style: CrosshairStyle = allowedStyles.includes((parsed as any).style)
+      ? (parsed as any).style
+      : 'classic'
+    if (
+      typeof (parsed as any).enabled !== 'boolean' ||
+      typeof (parsed as any).color !== 'string' ||
+      typeof (parsed as any).opacity !== 'number' ||
+      typeof (parsed as any).thickness !== 'number' ||
+      typeof (parsed as any).length !== 'number' ||
+      typeof (parsed as any).gap !== 'number' ||
+      typeof (parsed as any).centerDot !== 'boolean'
+    ) {
+      return null
+    }
+    const cfg: CrosshairConfig = {
+      enabled: (parsed as any).enabled,
+      style,
+      color: (parsed as any).color,
+      opacity: (parsed as any).opacity,
+      thickness: (parsed as any).thickness,
+      length: (parsed as any).length,
+      gap: (parsed as any).gap,
+      centerDot: (parsed as any).centerDot
+    }
+    return cfg
+  } catch {
+    return null
+  }
 })
