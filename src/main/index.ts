@@ -25,9 +25,9 @@ let overlayWindow: BrowserWindow | null = null
 function createSettingsWindow(): void {
   settingsWindow = new BrowserWindow({
     width: 1200,
-    height: 700,
+    height: 710,
     minWidth: 1200,
-    minHeight: 700,
+    minHeight: 710,
     show: false,
     frame: false,
     autoHideMenuBar: true,

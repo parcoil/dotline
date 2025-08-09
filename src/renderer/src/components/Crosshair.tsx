@@ -1,35 +1,51 @@
 import { useMemo } from 'react'
 import type { CrosshairConfig } from '../types/crosshair'
 
-export function Crosshair({ config }: { config: CrosshairConfig }) {
+export function Crosshair({
+  config,
+  mode = 'overlay'
+}: {
+  config: CrosshairConfig
+  mode?: 'overlay' | 'embed'
+}) {
   const style = useMemo(() => {
+    const isEmbed = mode === 'embed'
     return {
-      position: 'fixed' as const,
+      position: isEmbed ? 'absolute' : 'fixed',
       inset: 0,
       pointerEvents: 'none' as const,
       background: 'transparent'
     }
-  }, [])
+  }, [mode])
 
   if (!config.enabled) return null
 
   const colorWithOpacity = hexToRgba(config.color, config.opacity)
 
-  // Calculate center
+  // calculate center
   const size = Math.max((config.length + config.gap) * 2 + config.thickness * 2, 64)
   const center = size / 2
 
   return (
-    <div style={style}>
+    <div style={{ ...style, position: mode === 'embed' ? 'absolute' : ('fixed' as const) }}>
       <svg
         width={size}
         height={size}
-        style={{
-          position: 'absolute',
-          left: '50%',
-          top: '50%',
-          transform: 'translate(-50%, -50%)'
-        }}
+        style={
+          mode === 'embed'
+            ? {
+                position: 'absolute',
+                left: '50%',
+                top: '50%',
+                transform: 'translate(-50%, -50%)'
+              }
+            : {
+                position: 'absolute',
+                left: '50%',
+                top: '50%',
+                transform: 'translate(-50%, -50%)'
+              }
+        }
       >
         {config.style === 'classic' && (
           <>
@@ -130,6 +146,34 @@ export function Crosshair({ config }: { config: CrosshairConfig }) {
           />
         )}
       </svg>
+    </div>
+  )
+}
+
+export function CrosshairPreview({
+  config,
+  size = 96
+}: {
+  config: CrosshairConfig
+  size?: number
+}) {
+  // Reuse renderer but constrain SVG to preview size by scaling lengths to fit
+  const scale = Math.min(
+    1,
+    size / Math.max((config.length + config.gap) * 2 + config.thickness * 2, 64)
+  )
+  const scaled: CrosshairConfig = {
+    ...config,
+    length: Math.max(1, Math.round(config.length * scale)),
+    gap: Math.max(0, Math.round(config.gap * scale)),
+    thickness: Math.max(1, Math.round(config.thickness * scale))
+  }
+  return (
+    <div
+      className="relative flex items-center justify-center"
+      style={{ width: size, height: size }}
+    >
+      <Crosshair config={{ ...scaled, enabled: true }} />
     </div>
   )
 }

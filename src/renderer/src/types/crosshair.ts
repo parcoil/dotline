@@ -10,6 +10,13 @@ export type CrosshairConfig = {
   gap: number
   centerDot: boolean
 }
+
+export type CrosshairLibraryItem = {
+  id: string
+  name: string
+  createdAt: number
+  config: CrosshairConfig
+}
 export const defaultConfig: CrosshairConfig = {
   enabled: true,
   style: 'classic',
