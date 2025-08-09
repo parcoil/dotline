@@ -13,7 +13,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/renderer/src/**/*"],
+  "include": ["src/renderer/src/*"],
   "exclude": ["node_modules", "dist"],
   "references": [
     { "path": "./tsconfig.node.json" },

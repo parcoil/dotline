@@ -1,13 +1,27 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, screen } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
-function createWindow(): void {
-  // Create the browser window.
-  const mainWindow = new BrowserWindow({
+type CrosshairConfig = {
+  enabled: boolean
+  color: string
+  opacity: number
+  thickness: number
+  length: number
+  gap: number
+  centerDot: boolean
+}
+
+let settingsWindow: BrowserWindow | null = null
+let overlayWindow: BrowserWindow | null = null
+
+function createSettingsWindow(): void {
+  settingsWindow = new BrowserWindow({
     width: 1200,
     height: 700,
+    minWidth: 1200,
+    minHeight: 700,
     show: false,
     frame: false,
     autoHideMenuBar: true,
@@ -18,21 +32,66 @@ function createWindow(): void {
     }
   })
 
-  mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
+  settingsWindow.on('ready-to-show', () => {
+    settingsWindow?.show()
   })
 
-  mainWindow.webContents.setWindowOpenHandler((details) => {
+  settingsWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
     return { action: 'deny' }
   })
 
-  // HMR for renderer base on electron-vite cli.
-  // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
+    settingsWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+    settingsWindow.loadFile(join(__dirname, '../renderer/index.html'))
+  }
+}
+
+function createOverlayWindow(): void {
+  const primaryDisplay = screen.getPrimaryDisplay()
+  const { width, height } = primaryDisplay.workAreaSize
+
+  overlayWindow = new BrowserWindow({
+    width,
+    height,
+    x: 0,
+    y: 0,
+    show: false,
+    frame: false,
+    transparent: true,
+    hasShadow: false,
+    resizable: false,
+    skipTaskbar: true,
+    focusable: false,
+    fullscreen: false,
+    alwaysOnTop: true,
+    backgroundColor: '#00000000',
+    webPreferences: {
+      preload: join(__dirname, '../preload/index.js'),
+      sandbox: false
+    }
+  })
+
+  overlayWindow.setAlwaysOnTop(true, 'screen-saver')
+  overlayWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+
+  overlayWindow.on('ready-to-show', () => {
+    overlayWindow?.setIgnoreMouseEvents(true, { forward: true })
+    overlayWindow?.showInactive()
+  })
+
+  overlayWindow.on('close', (e) => {
+    e.preventDefault()
+    overlayWindow?.hide()
+  })
+
+  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+    overlayWindow.loadURL(`${process.env['ELECTRON_RENDERER_URL']}?overlay=1`)
+  } else {
+    overlayWindow.loadFile(join(__dirname, '../renderer/index.html'), {
+      query: { overlay: '1' }
+    })
   }
 }
 
@@ -50,15 +109,18 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
+  createSettingsWindow()
+  createOverlayWindow()
 
-  createWindow()
+  // Overlay will initialize itself from localStorage; we only forward updates via IPC
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+    if (BrowserWindow.getAllWindows().length === 0) {
+      createSettingsWindow()
+      createOverlayWindow()
+    }
   })
 })
 
@@ -96,4 +158,21 @@ ipcMain.on('window-control', (event, action: 'minimize' | 'maximize' | 'close') 
     default:
       break
   }
+})
+
+// Overlay controls
+ipcMain.handle('overlay:show', () => {
+  overlayWindow?.showInactive()
+  return true
+})
+
+ipcMain.handle('overlay:hide', () => {
+  overlayWindow?.hide()
+  return true
+})
+
+ipcMain.handle('overlay:update-config', (_event, config: CrosshairConfig) => {
+  // Forward to overlay
+  overlayWindow?.webContents.send('overlay:config', config)
+  return true
 })
