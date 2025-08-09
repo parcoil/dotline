@@ -17,7 +17,10 @@ function Titlebar() {
         // @ts-ignore
         WebkitAppRegion: 'drag',
         userSelect: 'none',
-        height: 42
+        height: 42,
+        // Expose a CSS var so sidebar can offset below titlebar
+        /* @ts-ignore */
+        ['--titlebar-height' as any]: '42px'
       }}
     >
       <div className="flex items-center gap-2 text-base font-semibold">Crosshair+</div>
