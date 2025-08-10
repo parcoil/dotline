@@ -1,12 +1,11 @@
+<div align="center">
 <img src="./resources/dotline.png" width="60" height="60" />
-
-<p align="center">
 
 <h1>Dotline</h1>
 
 <p>a modern crosshair overlay</p>
 
-</p>
+</div>
 
 ### Install
 
