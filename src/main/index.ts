@@ -64,13 +64,13 @@ function createSettingsWindow(): void {
 
 function createOverlayWindow(): void {
   const primaryDisplay = screen.getPrimaryDisplay()
-  const { width, height } = primaryDisplay.workAreaSize
+  const { x, y, width, height } = primaryDisplay.bounds
 
   overlayWindow = new BrowserWindow({
     width,
     height,
-    x: 0,
-    y: 0,
+    x,
+    y,
     show: false,
     frame: false,
     transparent: true,
@@ -194,6 +194,33 @@ ipcMain.handle('overlay:hide', () => {
 ipcMain.handle('overlay:update-config', (_event, config: CrosshairConfig) => {
   // Forward to overlay
   overlayWindow?.webContents.send('overlay:config', config)
+  return true
+})
+
+// Display management
+ipcMain.handle('overlay:list-displays', () => {
+  const displays = screen.getAllDisplays()
+  const primaryId = screen.getPrimaryDisplay().id
+  return displays.map((d, idx) => ({
+    id: d.id,
+    // Some platforms expose label; fallback to index and primary flag
+    label: (d as any).label ? (d as any).label : `Display ${idx + 1}${d.id === primaryId ? ' (Primary)' : ''}`,
+    bounds: d.bounds,
+    scaleFactor: d.scaleFactor
+  }))
+})
+
+ipcMain.handle('overlay:set-display', (_event, displayId: number) => {
+  const displays = screen.getAllDisplays()
+  const target = displays.find((d) => d.id === displayId)
+  if (!overlayWindow || !target) return false
+  const { x, y, width, height } = target.bounds
+  overlayWindow.setBounds({ x, y, width, height })
+  // Ensure overlay stays on top and ignores mouse
+  overlayWindow.setAlwaysOnTop(true, 'screen-saver')
+  overlayWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+  overlayWindow.setIgnoreMouseEvents(true, { forward: true })
+  overlayWindow.showInactive()
   return true
 })
 

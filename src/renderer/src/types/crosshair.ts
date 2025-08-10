@@ -10,6 +10,10 @@ export type CrosshairConfig = {
   gap: number
   centerDot: boolean
   creator?: string
+  overlayDisplayId?: number
+  offsetX?: number
+  offsetY?: number
+  scale?: number
 }
 
 export type CrosshairLibraryItem = {

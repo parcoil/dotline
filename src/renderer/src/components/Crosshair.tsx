@@ -10,20 +10,35 @@ export function Crosshair({
 }) {
   const style = useMemo(() => {
     const isEmbed = mode === 'embed'
-    return {
-      position: isEmbed ? 'absolute' : 'fixed',
-      inset: 0,
-      pointerEvents: 'none' as const,
-      background: 'transparent'
-    }
-  }, [mode])
+    const left = config.offsetX ?? 0
+    const top = config.offsetY ?? 0
+    return isEmbed
+      ? {
+          position: 'absolute' as const,
+          inset: 0,
+          pointerEvents: 'none' as const,
+          background: 'transparent'
+        }
+      : {
+          position: 'fixed' as const,
+          left: 0,
+          top: 0,
+          width: '100%',
+          height: '100%',
+          pointerEvents: 'none' as const,
+          background: 'transparent',
+          transform: `translate(${left}px, ${top}px)`
+        }
+  }, [mode, config.offsetX, config.offsetY])
 
   if (!config.enabled) return null
 
   const colorWithOpacity = hexToRgba(config.color, config.opacity)
 
   // calculate center
-  const size = Math.max((config.length + config.gap) * 2 + config.thickness * 2, 64)
+  const scale = config.scale && config.scale > 0 ? config.scale : 1
+  const baseSize = Math.max((config.length + config.gap) * 2 + config.thickness * 2, 64)
+  const size = Math.max(1, Math.round(baseSize * scale))
   const center = size / 2
 
   return (
@@ -37,7 +52,9 @@ export function Crosshair({
                 position: 'absolute',
                 left: '50%',
                 top: '50%',
-                transform: 'translate(-50%, -50%)'
+                transform: `translate(-50%, -50%) translate(${config.offsetX ?? 0}px, ${
+                  config.offsetY ?? 0
+                }px)`
               }
             : {
                 position: 'absolute',
