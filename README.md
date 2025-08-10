@@ -1,12 +1,12 @@
-# crosshairplusplus
+<img src="./resources/dotline.png" width="60" height="60" />
 
-An Electron application with React and TypeScript
+<p align="center">
 
-## Recommended IDE Setup
+<h1>Dotline</h1>
 
-- [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
+<p>a modern crosshair overlay</p>
 
-## Project Setup
+</p>
 
 ### Install
 
