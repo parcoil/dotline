@@ -203,8 +203,9 @@ ipcMain.handle('overlay:list-displays', () => {
   const primaryId = screen.getPrimaryDisplay().id
   return displays.map((d, idx) => ({
     id: d.id,
-    // Some platforms expose label; fallback to index and primary flag
-    label: (d as any).label ? (d as any).label : `Display ${idx + 1}${d.id === primaryId ? ' (Primary)' : ''}`,
+    label: (d as any).label
+      ? (d as any).label
+      : `Display ${idx + 1}${d.id === primaryId ? ' (Primary)' : ''}`,
     bounds: d.bounds,
     scaleFactor: d.scaleFactor
   }))
@@ -222,6 +223,20 @@ ipcMain.handle('overlay:set-display', (_event, displayId: number) => {
   overlayWindow.setIgnoreMouseEvents(true, { forward: true })
   overlayWindow.showInactive()
   return true
+})
+
+ipcMain.handle('overlay:get-display', () => {
+  if (!overlayWindow) return null
+  const bounds = overlayWindow.getBounds()
+  const displays = screen.getAllDisplays()
+  const target = displays.find(
+    (d) =>
+      d.bounds.x === bounds.x &&
+      d.bounds.y === bounds.y &&
+      d.bounds.width === bounds.width &&
+      d.bounds.height === bounds.height
+  )
+  return target ? target.id : null
 })
 
 // Import/Export configuration handlers

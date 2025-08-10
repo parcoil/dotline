@@ -42,6 +42,12 @@ function Positioning(): React.ReactElement {
         'overlay:list-displays'
       )) as DisplayInfo[]
       setDisplays(list)
+      const currentId = (await window.electron.ipcRenderer.invoke('overlay:get-display')) as
+        | number
+        | null
+      if (currentId) {
+        setConfig((c) => ({ ...c, overlayDisplayId: currentId }))
+      }
     })()
   }, [])
 
@@ -74,6 +80,15 @@ function Positioning(): React.ReactElement {
 
   return (
     <div className="max-w-3xl mx-auto space-y-4">
+      <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <h1 className="text-3xl font-bold tracking-tight">Positioning</h1>
+        <div className="flex flex-wrap gap-3">
+          <Button variant="outline" onClick={() => setConfig(defaultConfig)}>
+            Reset
+          </Button>
+          <Button onClick={saveAndApply}>Apply</Button>
+        </div>
+      </header>
       <Card>
         <CardHeader>
           <CardTitle>Display</CardTitle>

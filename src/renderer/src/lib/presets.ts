@@ -10,7 +10,7 @@ export const presets: { name: string; config: CrosshairConfig }[] = [
     config: { ...defaultConfig, style: 'dot', thickness: 2, color: '#ffffff', creator: 'Parcoil' }
   },
   {
-    name: 'Circle ADS',
+    name: 'Circle',
     config: { ...defaultConfig, style: 'circle', length: 12, gap: 2, creator: 'Parcoil' }
   },
   {

@@ -36,9 +36,7 @@ export function Crosshair({
   const colorWithOpacity = hexToRgba(config.color, config.opacity)
 
   // calculate center
-  const scale = config.scale && config.scale > 0 ? config.scale : 1
-  const baseSize = Math.max((config.length + config.gap) * 2 + config.thickness * 2, 64)
-  const size = Math.max(1, Math.round(baseSize * scale))
+  const size = Math.max((config.length + config.gap) * 2 + config.thickness * 2, 64)
   const center = size / 2
 
   return (

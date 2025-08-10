@@ -13,7 +13,6 @@ export type CrosshairConfig = {
   overlayDisplayId?: number
   offsetX?: number
   offsetY?: number
-  scale?: number
 }
 
 export type CrosshairLibraryItem = {

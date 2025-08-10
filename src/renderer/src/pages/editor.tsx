@@ -104,6 +104,15 @@ function Editor() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-4">
+      <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <h1 className="text-3xl font-bold tracking-tight">Editor</h1>
+        <div className="flex flex-wrap gap-3">
+          <Button variant="outline" onClick={() => setConfig(defaultConfig)}>
+            Reset
+          </Button>
+          <Button onClick={save}>Apply</Button>
+        </div>
+      </header>
       <Card>
         <CardHeader>
           <CardTitle>Preview</CardTitle>
