@@ -110,7 +110,7 @@ function Editor() {
           <Button variant="outline" onClick={() => setConfig(defaultConfig)}>
             Reset
           </Button>
-          <Button onClick={save}>Apply</Button>
+          <Button onClick={save}>Apply to current</Button>
         </div>
       </header>
       <Card>

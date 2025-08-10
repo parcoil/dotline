@@ -26,7 +26,11 @@ function Overlay() {
     if (savedRaw) {
       try {
         const saved = JSON.parse(savedRaw) as Partial<CrosshairConfig>
-        setConfig({ ...defaultConfig, ...saved })
+        const merged = { ...defaultConfig, ...saved }
+        setConfig(merged)
+        if (merged.overlayDisplayId) {
+          window.electron.ipcRenderer.invoke('overlay:set-display', merged.overlayDisplayId)
+        }
       } catch {}
     }
   }, [])
