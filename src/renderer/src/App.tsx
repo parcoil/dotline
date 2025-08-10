@@ -60,6 +60,16 @@ function RoutedApp() {
 function App() {
   const params = new URLSearchParams(window.location.search)
   const isOverlay = params.get('overlay') === '1'
+
+  useEffect(() => {
+    if (!isOverlay) {
+      const discordRpcDisabled = localStorage.getItem('discordRpcDisabled')
+      if (discordRpcDisabled !== '1' && discordRpcDisabled !== 'true') {
+        window.electron.ipcRenderer.invoke('start-discord-rpc').catch(() => {})
+      }
+    }
+  }, [isOverlay])
+
   return isOverlay ? <Overlay /> : <RoutedApp />
 }
 

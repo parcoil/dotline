@@ -4,6 +4,7 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import dotlinePng from '../../resources/dotline.png?asset'
 import { createAppTray, notifyMinimizedToTrayOnce } from './tray'
+import './rpc'
 import { promises as fs } from 'fs'
 
 type CrosshairStyle = 'classic' | 'dot' | 'circle' | 'x'
