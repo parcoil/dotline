@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 import { Home, Settings, Menu, ChevronLeft, Pencil, Axis3D } from 'lucide-react'
 
 function Sidebar() {
-  const [collapsed, setCollapsed] = useState(false)
+  const [collapsed, setCollapsed] = useState(true)
 
   useEffect(() => {
     const saved = localStorage.getItem('sidebar-collapsed')
@@ -32,13 +32,8 @@ function Sidebar() {
         collapsed ? 'w-14' : 'w-56'
       )}
     >
-      <div className="flex items-center justify-between p-2">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="shrink-0"
-          onClick={() => setCollapsed(!collapsed)}
-        >
+      <div className={cn('flex items-center justify-between p-2', collapsed && 'border-b')}>
+        <Button variant="ghost" onClick={() => setCollapsed(!collapsed)}>
           {collapsed ? <Menu size={18} /> : <ChevronLeft size={18} />}
         </Button>
       </div>
@@ -50,14 +45,15 @@ function Sidebar() {
             to={to}
             className={({ isActive }) =>
               cn(
-                'flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-all active:scale-95',
+                'flex items-center rounded-md px-3 py-2 text-sm transition-all active:scale-95',
+                collapsed ? 'justify-start gap-0' : 'gap-2',
                 isActive
                   ? 'bg-primary text-primary-foreground'
                   : 'hover:bg-accent hover:text-accent-foreground'
               )
             }
           >
-            {icon}
+            <span className="w-5 h-5 flex items-center justify-start">{icon}</span>
             {!collapsed && label}
           </NavLink>
         ))}

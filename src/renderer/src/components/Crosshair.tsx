@@ -173,7 +173,7 @@ export function CrosshairPreview({
       className="relative flex items-center justify-center"
       style={{ width: size, height: size }}
     >
-      <Crosshair config={{ ...scaled, enabled: true }} />
+      <Crosshair mode="embed" config={{ ...scaled, enabled: true }} />
     </div>
   )
 }

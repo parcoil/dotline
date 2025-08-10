@@ -9,6 +9,7 @@ export type CrosshairConfig = {
   length: number
   gap: number
   centerDot: boolean
+  creator?: string
 }
 
 export type CrosshairLibraryItem = {

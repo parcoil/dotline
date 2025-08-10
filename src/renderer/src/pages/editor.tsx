@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { CrosshairConfig } from '../types/crosshair'
+import type { CrosshairLibraryItem } from '../types/crosshair'
 import { Label } from '../components/ui/label'
 import { Input } from '../components/ui/input'
 import { Slider } from '../components/ui/slider'
@@ -14,25 +15,27 @@ import {
   SelectItem,
   SelectValue
 } from '@/components/ui/select'
+import { Crosshair } from '@/components/crosshair'
+import { useLocation } from 'react-router'
 
 function Editor() {
-  const [config, setConfig] = useState<CrosshairConfig>(defaultConfig)
+  const location = useLocation()
+  const navInitial = (location.state as any)?.initialConfig as CrosshairConfig | undefined
+  const [config, setConfig] = useState<CrosshairConfig>(navInitial ?? defaultConfig)
+  const [saveName, setSaveName] = useState<string>('')
 
   useEffect(() => {
-    const savedRaw = localStorage.getItem('currentConfig')
-    if (savedRaw) {
-      try {
-        const saved = JSON.parse(savedRaw) as Partial<CrosshairConfig>
-        const merged = { ...defaultConfig, ...saved }
-        setConfig(merged)
-        window.electron.ipcRenderer.invoke('overlay:update-config', merged)
-      } catch {}
+    if (!navInitial) {
+      const savedRaw = localStorage.getItem('currentConfig')
+      if (savedRaw) {
+        try {
+          const saved = JSON.parse(savedRaw) as Partial<CrosshairConfig>
+          const merged = { ...defaultConfig, ...saved }
+          setConfig(merged)
+        } catch {}
+      }
     }
   }, [])
-
-  useEffect(() => {
-    window.electron.ipcRenderer.invoke('overlay:update-config', config)
-  }, [config])
 
   const handleChange = <K extends keyof CrosshairConfig>(key: K, value: CrosshairConfig[K]) => {
     setConfig((c) => ({ ...c, [key]: value }))
@@ -56,8 +59,66 @@ function Editor() {
     }
   }
 
+  const LS_KEY = 'crosshairLibrary'
+  function loadLibrary(): CrosshairLibraryItem[] {
+    try {
+      const raw = localStorage.getItem(LS_KEY)
+      if (!raw) return []
+      const parsed = JSON.parse(raw)
+      if (!Array.isArray(parsed)) return []
+      return parsed
+    } catch {
+      return []
+    }
+  }
+  function saveLibrary(items: CrosshairLibraryItem[]) {
+    localStorage.setItem(LS_KEY, JSON.stringify(items))
+  }
+  function makeId() {
+    return Math.random().toString(36).slice(2, 10)
+  }
+  const saveToLibrary = () => {
+    const library = loadLibrary()
+    const item: CrosshairLibraryItem = {
+      id: makeId(),
+      name: saveName && saveName.trim() ? saveName.trim() : `Crosshair ${library.length + 1}`,
+      createdAt: Date.now(),
+      config
+    }
+    const next = [item, ...library]
+    saveLibrary(next)
+    setSaveName('')
+  }
+
+  const scaleConfigForPreview = (cfg: CrosshairConfig, size: number): CrosshairConfig => {
+    const base = Math.max((cfg.length + cfg.gap) * 2 + cfg.thickness * 2, 64)
+    const scale = Math.min(1, size / base)
+    return {
+      ...cfg,
+      enabled: true,
+      length: Math.max(1, Math.round(cfg.length * scale)),
+      gap: Math.max(0, Math.round(cfg.gap * scale)),
+      thickness: Math.max(1, Math.round(cfg.thickness * scale))
+    }
+  }
+
   return (
-    <div className=" max-w-lg mx-auto space-y-4">
+    <div className="max-w-3xl mx-auto space-y-4">
+      <Card>
+        <CardHeader>
+          <CardTitle>Preview</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center">
+            <div
+              className="rounded-md border bg-background relative flex items-center justify-center"
+              style={{ width: 240, height: 240 }}
+            >
+              <Crosshair mode="embed" config={scaleConfigForPreview(config, 220)} />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
       <Card>
         <CardHeader>
           <CardTitle>General</CardTitle>
@@ -170,7 +231,7 @@ function Editor() {
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-3 gap-2">
+      <div className="flex  gap-2 justify-center items-center">
         <Button onClick={handleImport} variant="outline" size="sm">
           Import
         </Button>
@@ -178,9 +239,23 @@ function Editor() {
           Export
         </Button>
         <Button onClick={save} size="sm">
-          Save
+          Apply to Current
         </Button>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Save to Library</CardTitle>
+        </CardHeader>
+        <CardContent className="flex items-center gap-2">
+          <Input
+            placeholder="Give your crosshair a name"
+            value={saveName}
+            onChange={(e) => setSaveName(e.target.value)}
+          />
+          <Button onClick={saveToLibrary}>Save</Button>
+        </CardContent>
+      </Card>
     </div>
   )
 }

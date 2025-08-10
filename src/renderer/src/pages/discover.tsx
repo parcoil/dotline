@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Crosshair } from '@/components/crosshair'
 import type { CrosshairConfig, CrosshairLibraryItem } from '@/types/crosshair'
 import { defaultConfig } from '@/types/crosshair'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { presets } from '@/lib/presets'
 
 const LS_KEY = 'crosshairLibrary'
 
@@ -27,17 +30,8 @@ function makeId() {
   return Math.random().toString(36).slice(2, 10)
 }
 
-const presets: { name: string; config: CrosshairConfig }[] = [
-  { name: 'Green Classic', config: { ...defaultConfig, style: 'classic', color: '#22C55E' } },
-  { name: 'Tiny Dot', config: { ...defaultConfig, style: 'dot', thickness: 2, color: '#ffffff' } },
-  { name: 'Circle ADS', config: { ...defaultConfig, style: 'circle', length: 12, gap: 2 } },
-  {
-    name: 'X Neon',
-    config: { ...defaultConfig, style: 'x', color: '#00e5ff', thickness: 2, gap: 3 }
-  }
-]
-
 function Discover() {
+  const navigate = useNavigate()
   const [library, setLibrary] = useState<CrosshairLibraryItem[]>([])
   const [current, setCurrent] = useState<CrosshairConfig>(defaultConfig)
 
@@ -89,6 +83,10 @@ function Discover() {
 
   const saveCurrentToLibrary = () => addPresetToLibrary(current, 'Current Config')
 
+  const editItem = (cfg: CrosshairConfig) => {
+    navigate('/editor', { state: { initialConfig: cfg } })
+  }
+
   const scaleConfigForPreview = (cfg: CrosshairConfig, size: number): CrosshairConfig => {
     const base = Math.max((cfg.length + cfg.gap) * 2 + cfg.thickness * 2, 64)
     const scale = Math.min(1, size / base)
@@ -102,41 +100,55 @@ function Discover() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Discover Crosshairs</h1>
-        <div className="flex gap-2">
+    <div className="space-y-8 px-4 md:px-0 max-w-[1200px] mx-auto">
+      <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <h1 className="text-3xl font-extrabold tracking-tight">Discover Crosshairs</h1>
+        <div className="flex flex-wrap gap-3">
           <Button variant="outline" onClick={importPresetFile}>
-            Import preset
+            Import Preset
           </Button>
-          <Button onClick={saveCurrentToLibrary}>Save current to library</Button>
+          <Button onClick={saveCurrentToLibrary}>Save Current to Library</Button>
         </div>
-      </div>
+      </header>
 
       <Card>
         <CardHeader>
           <CardTitle>Presets</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {presets.map((p) => (
-              <div key={p.name} className="flex flex-col items-center gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+            {presets.map((preset) => (
+              <div
+                key={preset.name}
+                className="flex flex-col items-center gap-3"
+                tabIndex={0}
+                role="group"
+                aria-label={`Preset: ${preset.name}`}
+              >
                 <div
-                  className="rounded-md border bg-background relative flex items-center justify-center"
+                  className="rounded-md border border-border bg-background relative flex items-center justify-center shadow-sm transition-shadow hover:shadow-md focus-visible:shadow-md outline-none"
                   style={{ width: 120, height: 120 }}
                 >
-                  <Crosshair mode="embed" config={scaleConfigForPreview(p.config, 120)} />
+                  <Crosshair mode="embed" config={scaleConfigForPreview(preset.config, 120)} />
                 </div>
-                <div className="text-sm text-center">{p.name}</div>
+                <p
+                  className="text-sm font-semibold text-center truncate w-full"
+                  title={preset.name}
+                >
+                  {preset.name}
+                </p>
+                <p className="text-xs text-muted-foreground text-center truncate w-full">
+                  Created by <span className="font-bold">{preset.config.creator}</span>
+                </p>
                 <div className="flex gap-2">
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => addPresetToLibrary(p.config, p.name)}
+                    onClick={() => addPresetToLibrary(preset.config, preset.name)}
                   >
-                    Add
+                    Import
                   </Button>
-                  <Button size="sm" onClick={() => applyConfig(p.config)}>
+                  <Button size="sm" onClick={() => applyConfig(preset.config)}>
                     Apply
                   </Button>
                 </div>
@@ -152,28 +164,46 @@ function Discover() {
         </CardHeader>
         <CardContent>
           {library.length === 0 ? (
-            <div className="text-muted-foreground text-sm">No saved crosshairs yet.</div>
+            <p className="text-muted-foreground text-center text-sm py-8">
+              No saved crosshairs yet.
+            </p>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
               {library.map((item) => (
-                <div key={item.id} className="space-y-2">
+                <div
+                  key={item.id}
+                  className="space-y-3"
+                  tabIndex={0}
+                  role="group"
+                  aria-label={item.name}
+                >
                   <div
-                    className="rounded-md border bg-background relative flex items-center justify-center"
-                    style={{ width: 160, height: 160 }}
+                    className="rounded-md border border-border bg-background relative flex items-center justify-center shadow-sm transition-shadow hover:shadow-md focus-visible:shadow-md outline-none"
+                    style={{ width: 140, height: 140 }}
                   >
-                    <Crosshair mode="embed" config={scaleConfigForPreview(item.config, 160)} />
+                    <Crosshair mode="embed" config={scaleConfigForPreview(item.config, 140)} />
                   </div>
-                  <div className="text-sm font-medium truncate" title={item.name}>
-                    {item.name}
-                  </div>
-                  <div className="flex gap-2">
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <p className="text-sm font-medium truncate cursor-default" title={item.name}>
+                        {item.name}
+                      </p>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <span>{item.name}</span>
+                    </TooltipContent>
+                  </Tooltip>
+                  <div className="flex flex-wrap gap-2">
                     <Button size="sm" onClick={() => applyConfig(item.config)}>
                       Apply
+                    </Button>
+                    <Button size="sm" variant="secondary" onClick={() => editItem(item.config)}>
+                      Edit
                     </Button>
                     <Button size="sm" variant="outline" onClick={() => exportItem(item)}>
                       Export
                     </Button>
-                    <Button size="sm" variant="ghost" onClick={() => deleteItem(item.id)}>
+                    <Button size="sm" variant="destructive" onClick={() => deleteItem(item.id)}>
                       Delete
                     </Button>
                   </div>
