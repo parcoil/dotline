@@ -1,10 +1,10 @@
 {
-  "name": "crosshairplusplus",
-  "version": "1.0.0",
-  "description": "An Electron application with React and TypeScript",
+  "name": "dotline",
+  "version": "0.1.0",
+  "description": "a modern crosshair overlay.",
   "main": "./out/main/index.js",
-  "author": "example.com",
-  "homepage": "https://electron-vite.org",
+  "author": "Parcoil",
+  "homepage": "https://parcoil.com",
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint --cache .",

@@ -1,5 +1,5 @@
 import { BrowserWindow, Menu, Notification, Tray, app } from 'electron'
-import icon from '../../resources/icon.png?asset'
+import dotlinePng from '../../resources/dotline.png?asset'
 
 let tray: Tray | null = null
 let hasNotifiedMinimized = false
@@ -9,11 +9,9 @@ export function createAppTray(options: {
   createMainWindow: () => void
 }): Tray {
   if (tray) return tray
-
-  // The icon import resolves to a file path via electron-vite
-  const trayIcon = icon as unknown as string
+  const trayIcon = dotlinePng as unknown as string
   tray = new Tray(trayIcon)
-  tray.setToolTip('Crosshair+')
+  tray.setToolTip('Dotline')
 
   const openApp = () => {
     const win = options.getMainWindow()
@@ -27,7 +25,7 @@ export function createAppTray(options: {
   }
 
   const contextMenu = Menu.buildFromTemplate([
-    { label: 'Open Crosshair+', click: openApp },
+    { label: 'Open Dotline', click: openApp },
     { type: 'separator' },
     { label: 'Quit', click: () => process.nextTick(() => app.quit()) }
   ])
@@ -43,8 +41,8 @@ export function notifyMinimizedToTrayOnce(): void {
   if (hasNotifiedMinimized) return
   hasNotifiedMinimized = true
   new Notification({
-    title: 'Crosshair+',
-    icon: icon,
+    title: 'Dotline',
+    icon: dotlinePng,
     body: 'Still running in the tray. Click the tray icon to reopen.',
     silent: true
   }).show()

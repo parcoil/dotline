@@ -2,7 +2,7 @@ import { app, shell, BrowserWindow, ipcMain, screen, dialog } from 'electron'
 import type { SaveDialogOptions, OpenDialogOptions } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import icon from '../../resources/icon.png?asset'
+import dotlinePng from '../../resources/dotline.png?asset'
 import { createAppTray, notifyMinimizedToTrayOnce } from './tray'
 import { promises as fs } from 'fs'
 
@@ -31,7 +31,11 @@ function createSettingsWindow(): void {
     show: false,
     frame: false,
     autoHideMenuBar: true,
-    ...(process.platform === 'linux' ? { icon } : {}),
+    ...(process.platform === 'linux'
+      ? { icon: dotlinePng }
+      : {
+          icon: dotlinePng
+        }),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false

@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { useTheme } from '@/components/theme-provider'
 import { Sun, Moon, X, Square, Minus } from 'lucide-react'
+import dotlineImage from '../../../../resources/dotline.png'
 
 function Titlebar() {
   const { theme, setTheme } = useTheme()
@@ -23,7 +24,10 @@ function Titlebar() {
         ['--titlebar-height' as any]: '42px'
       }}
     >
-      <div className="flex items-center gap-2 text-base font-semibold">Crosshair+</div>
+      <div className="flex items-center gap-2 text-base font-semibold">
+        <img src={dotlineImage} alt="" className="w-5 h-5" />
+        Dotline
+      </div>
       {/* @ts-ignore */}
       <div className="flex items-center gap-2" style={{ WebkitAppRegion: 'no-drag' }}>
         <Button
