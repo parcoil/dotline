@@ -1,20 +1,20 @@
-import type React from 'react'
-import { useEffect, useMemo, useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Switch } from '@/components/ui/switch'
-import type { CrosshairConfig } from '@/types/crosshair'
-import { defaultConfig } from '@/types/crosshair'
-import { Crosshair } from '@/components/crosshair'
+import type React from "react"
+import { useEffect, useMemo, useState } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Switch } from "@/components/ui/switch"
+import type { CrosshairConfig } from "@/types/crosshair"
+import { defaultConfig } from "@/types/crosshair"
+import { Crosshair } from "@/components/crosshair"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue
-} from '@/components/ui/select'
+} from "@/components/ui/select"
 
 type DisplayInfo = {
   id: number
@@ -25,7 +25,7 @@ type DisplayInfo = {
 
 function Positioning(): React.ReactElement {
   const [config, setConfig] = useState<CrosshairConfig>(() => {
-    const raw = localStorage.getItem('currentConfig')
+    const raw = localStorage.getItem("currentConfig")
     if (!raw) return defaultConfig
     try {
       return { ...defaultConfig, ...JSON.parse(raw) }
@@ -39,10 +39,10 @@ function Positioning(): React.ReactElement {
   useEffect((): void => {
     ;(async () => {
       const list = (await window.electron.ipcRenderer.invoke(
-        'overlay:list-displays'
+        "overlay:list-displays"
       )) as DisplayInfo[]
       setDisplays(list)
-      const currentId = (await window.electron.ipcRenderer.invoke('overlay:get-display')) as
+      const currentId = (await window.electron.ipcRenderer.invoke("overlay:get-display")) as
         | number
         | null
       if (currentId) {
@@ -59,10 +59,10 @@ function Positioning(): React.ReactElement {
   }
 
   const saveAndApply = async (): Promise<void> => {
-    localStorage.setItem('currentConfig', JSON.stringify(config))
-    await window.electron.ipcRenderer.invoke('overlay:update-config', config)
+    localStorage.setItem("currentConfig", JSON.stringify(config))
+    await window.electron.ipcRenderer.invoke("overlay:update-config", config)
     if (config.overlayDisplayId) {
-      await window.electron.ipcRenderer.invoke('overlay:set-display', config.overlayDisplayId)
+      await window.electron.ipcRenderer.invoke("overlay:set-display", config.overlayDisplayId)
     }
   }
 
@@ -100,8 +100,8 @@ function Positioning(): React.ReactElement {
               value={config.overlayDisplayId ? String(config.overlayDisplayId) : undefined}
               onValueChange={async (v) => {
                 const id = Number(v)
-                handleChange('overlayDisplayId', id)
-                await window.electron.ipcRenderer.invoke('overlay:set-display', id)
+                handleChange("overlayDisplayId", id)
+                await window.electron.ipcRenderer.invoke("overlay:set-display", id)
               }}
             >
               <SelectTrigger className="w-60">
@@ -137,7 +137,7 @@ function Positioning(): React.ReactElement {
                 id="offsetX"
                 type="number"
                 value={config.offsetX ?? 0}
-                onChange={(e) => handleChange('offsetX', Number(e.target.value))}
+                onChange={(e) => handleChange("offsetX", Number(e.target.value))}
               />
             </div>
             <div className="space-y-2">
@@ -146,17 +146,9 @@ function Positioning(): React.ReactElement {
                 id="offsetY"
                 type="number"
                 value={config.offsetY ?? 0}
-                onChange={(e) => handleChange('offsetY', Number(e.target.value))}
+                onChange={(e) => handleChange("offsetY", Number(e.target.value))}
               />
             </div>
-          </div>
-
-          <div className="flex items-center justify-between pt-2">
-            <Label>Enabled</Label>
-            <Switch
-              checked={config.enabled}
-              onCheckedChange={(checked) => handleChange('enabled', !!checked)}
-            />
           </div>
         </CardContent>
       </Card>

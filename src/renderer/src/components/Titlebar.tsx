@@ -3,8 +3,11 @@ import { useTheme } from "@/components/theme-provider"
 import { Sun, Moon, X, Square, Minus } from "lucide-react"
 import dotlineImage from "../../../../resources/dotline.png"
 import data from "../../../../package.json"
+import { Switch } from "@/components/ui/switch"
+import { useOverlayVisibility } from "@/hooks/overlay"
 function Titlebar() {
   const { theme, setTheme } = useTheme()
+  const { enabled, setEnabled } = useOverlayVisibility()
 
   const handleWindowControl = (action: "minimize" | "maximize" | "close") => {
     // @ts-ignore
@@ -30,7 +33,11 @@ function Titlebar() {
         <p className="text-sm text-muted-foreground">v{data.version}</p>
       </div>
       {/* @ts-ignore */}
-      <div className="flex items-center gap-2" style={{ WebkitAppRegion: "no-drag" }}>
+      <div className="flex items-center gap-3" style={{ WebkitAppRegion: "no-drag" }}>
+        <div className="flex items-center gap-2 mr-2">
+          <span className="text-xs text-muted-foreground">Crosshair</span>
+          <Switch checked={enabled} onCheckedChange={(v) => setEnabled(!!v)} />
+        </div>
         <Button
           variant="ghost"
           size="icon"

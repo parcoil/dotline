@@ -1,32 +1,32 @@
-import { useEffect, useState } from 'react'
-import { CrosshairConfig } from '../types/crosshair'
-import type { CrosshairLibraryItem } from '../types/crosshair'
-import { Label } from '../components/ui/label'
-import { Input } from '../components/ui/input'
-import { Slider } from '../components/ui/slider'
-import { Button } from '../components/ui/button'
-import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card'
-import { defaultConfig } from '../types/crosshair'
-import { Switch } from '@/components/ui/switch'
+import { useEffect, useState } from "react"
+import { CrosshairConfig } from "../types/crosshair"
+import type { CrosshairLibraryItem } from "../types/crosshair"
+import { Label } from "../components/ui/label"
+import { Input } from "../components/ui/input"
+import { Slider } from "../components/ui/slider"
+import { Button } from "../components/ui/button"
+import { Card, CardHeader, CardTitle, CardContent } from "../components/ui/card"
+import { defaultConfig } from "../types/crosshair"
+import { Switch } from "@/components/ui/switch"
 import {
   Select,
   SelectTrigger,
   SelectContent,
   SelectItem,
   SelectValue
-} from '@/components/ui/select'
-import { Crosshair } from '@/components/crosshair'
-import { useLocation } from 'react-router'
+} from "@/components/ui/select"
+import { Crosshair } from "@/components/crosshair"
+import { useLocation } from "react-router"
 
 function Editor() {
   const location = useLocation()
   const navInitial = (location.state as any)?.initialConfig as CrosshairConfig | undefined
   const [config, setConfig] = useState<CrosshairConfig>(navInitial ?? defaultConfig)
-  const [saveName, setSaveName] = useState<string>('')
+  const [saveName, setSaveName] = useState<string>("")
 
   useEffect(() => {
     if (!navInitial) {
-      const savedRaw = localStorage.getItem('currentConfig')
+      const savedRaw = localStorage.getItem("currentConfig")
       if (savedRaw) {
         try {
           const saved = JSON.parse(savedRaw) as Partial<CrosshairConfig>
@@ -42,24 +42,24 @@ function Editor() {
   }
 
   const save = async () => {
-    localStorage.setItem('currentConfig', JSON.stringify(config))
-    await window.electron.ipcRenderer.invoke('overlay:update-config', config)
+    localStorage.setItem("currentConfig", JSON.stringify(config))
+    await window.electron.ipcRenderer.invoke("overlay:update-config", config)
   }
 
   const handleExport = async () => {
-    await window.electron.ipcRenderer.invoke('config:export', config)
+    await window.electron.ipcRenderer.invoke("config:export", config)
   }
 
   const handleImport = async () => {
-    const imported = await window.electron.ipcRenderer.invoke('config:import')
+    const imported = await window.electron.ipcRenderer.invoke("config:import")
     if (imported) {
       setConfig(imported as CrosshairConfig)
-      localStorage.setItem('currentConfig', JSON.stringify(imported))
-      await window.electron.ipcRenderer.invoke('overlay:update-config', imported as CrosshairConfig)
+      localStorage.setItem("currentConfig", JSON.stringify(imported))
+      await window.electron.ipcRenderer.invoke("overlay:update-config", imported as CrosshairConfig)
     }
   }
 
-  const LS_KEY = 'crosshairLibrary'
+  const LS_KEY = "crosshairLibrary"
   function loadLibrary(): CrosshairLibraryItem[] {
     try {
       const raw = localStorage.getItem(LS_KEY)
@@ -87,7 +87,7 @@ function Editor() {
     }
     const next = [item, ...library]
     saveLibrary(next)
-    setSaveName('')
+    setSaveName("")
   }
 
   const scaleConfigForPreview = (cfg: CrosshairConfig, size: number): CrosshairConfig => {
@@ -133,17 +133,9 @@ function Editor() {
           <CardTitle>General</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <Label>Enabled</Label>
-            <Switch
-              checked={config.enabled}
-              onCheckedChange={(checked) => handleChange('enabled', !!checked)}
-            />
-          </div>
-
           <div className="flex items-center justify-between gap-4">
             <Label>Style</Label>
-            <Select value={config.style} onValueChange={(v) => handleChange('style', v as any)}>
+            <Select value={config.style} onValueChange={(v) => handleChange("style", v as any)}>
               <SelectTrigger className="w-40">
                 <SelectValue />
               </SelectTrigger>
@@ -162,7 +154,7 @@ function Editor() {
               id="color-picker"
               type="color"
               value={config.color}
-              onChange={(e) => handleChange('color', e.target.value)}
+              onChange={(e) => handleChange("color", e.target.value)}
               className="w-20 h-10 p-0 border-none cursor-pointer mt-1"
             />
           </div>
@@ -181,7 +173,7 @@ function Editor() {
             </div>
             <Slider
               value={[config.opacity]}
-              onValueChange={(val) => handleChange('opacity', val[0])}
+              onValueChange={(val) => handleChange("opacity", val[0])}
               min={0}
               max={1}
               step={0.01}
@@ -195,7 +187,7 @@ function Editor() {
             </div>
             <Slider
               value={[config.thickness]}
-              onValueChange={(val) => handleChange('thickness', val[0])}
+              onValueChange={(val) => handleChange("thickness", val[0])}
               min={1}
               max={10}
               step={1}
@@ -209,7 +201,7 @@ function Editor() {
             </div>
             <Slider
               value={[config.length]}
-              onValueChange={(val) => handleChange('length', val[0])}
+              onValueChange={(val) => handleChange("length", val[0])}
               min={2}
               max={50}
               step={1}
@@ -223,7 +215,7 @@ function Editor() {
             </div>
             <Slider
               value={[config.gap]}
-              onValueChange={(val) => handleChange('gap', val[0])}
+              onValueChange={(val) => handleChange("gap", val[0])}
               min={0}
               max={50}
               step={1}
@@ -234,7 +226,7 @@ function Editor() {
             <Label>Center Dot</Label>
             <Switch
               checked={config.centerDot}
-              onCheckedChange={(checked) => handleChange('centerDot', !!checked)}
+              onCheckedChange={(checked) => handleChange("centerDot", !!checked)}
             />
           </div>
         </CardContent>

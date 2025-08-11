@@ -20,6 +20,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Toaster } from "@/components/ui/sonner"
 import { toast } from "sonner"
+import { OverlayProvider } from "@/hooks/overlay"
 
 function Overlay() {
   const [config, setConfig] = useState<CrosshairConfig>(defaultConfig)
@@ -163,7 +164,13 @@ function App() {
     }
   }, [isOverlay])
 
-  return isOverlay ? <Overlay /> : <RoutedApp />
+  return isOverlay ? (
+    <Overlay />
+  ) : (
+    <OverlayProvider>
+      <RoutedApp />
+    </OverlayProvider>
+  )
 }
 
 export default App
