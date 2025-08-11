@@ -6,6 +6,7 @@ import dotlinePng from "../../resources/dotline.png?asset"
 import { createAppTray, notifyMinimizedToTrayOnce } from "./tray"
 import "./rpc"
 import { promises as fs } from "fs"
+import { initAutoUpdater, triggerAutoUpdateCheck } from "./updater"
 
 type CrosshairStyle = "classic" | "dot" | "circle" | "x"
 
@@ -129,6 +130,13 @@ app.whenReady().then(() => {
 
   createSettingsWindow()
   createOverlayWindow()
+
+  // Initialize auto updater and perform a background check
+  initAutoUpdater(() => settingsWindow)
+  // Delay a little to avoid stealing focus on cold start
+  setTimeout(() => {
+    void triggerAutoUpdateCheck()
+  }, 1500)
 
   createAppTray({
     getMainWindow: () => settingsWindow,

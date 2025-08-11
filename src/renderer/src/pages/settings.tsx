@@ -2,10 +2,12 @@ import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
-// import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
 
 function Settings() {
   const [rpcEnabled, setRpcEnabled] = useState<boolean>(true)
+  const [checking, setChecking] = useState(false)
 
   useEffect(() => {
     const disabled = localStorage.getItem("discordRpcDisabled")
@@ -27,6 +29,20 @@ function Settings() {
   //   await window.electron.ipcRenderer.invoke('app:open-logs')
   // }
 
+  const checkForUpdates = async () => {
+    try {
+      setChecking(true)
+      const res = await window.electron.ipcRenderer.invoke("updater:check")
+      if (res?.ok && !res.updateInfo) {
+        toast.success("You're up to date")
+      }
+    } catch (e) {
+      toast.error(String(e))
+    } finally {
+      setChecking(false)
+    }
+  }
+
   return (
     <div className="max-w-3xl mx-auto space-y-4">
       <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
@@ -40,6 +56,20 @@ function Settings() {
             <Label>Enable Discord RPC</Label>
             <Switch checked={rpcEnabled} onCheckedChange={(v) => handleToggleRpc(!!v)} />
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Updates</CardTitle>
+        </CardHeader>
+        <CardContent className="flex items-center justify-between">
+          <div>
+            <p className="text-sm text-muted-foreground">Check for updates to Dotline.</p>
+          </div>
+          <Button variant="outline" onClick={checkForUpdates} disabled={checking}>
+            {checking ? "Checking…" : "Check for updates"}
+          </Button>
         </CardContent>
       </Card>
 
