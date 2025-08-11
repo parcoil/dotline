@@ -1,16 +1,16 @@
-import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Crosshair } from '@/components/crosshair'
-import type { CrosshairConfig, CrosshairLibraryItem } from '@/types/crosshair'
-import { defaultConfig } from '@/types/crosshair'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { presets } from '@/lib/presets'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Home, Paintbrush, Import, Save, Trash2, Pencil, Download } from 'lucide-react'
+import { useEffect, useState } from "react"
+import { useNavigate } from "react-router"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Crosshair } from "@/components/crosshair"
+import type { CrosshairConfig, CrosshairLibraryItem } from "@/types/crosshair"
+import { defaultConfig } from "@/types/crosshair"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { presets } from "@/lib/presets"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Home, Paintbrush, Import, Save, Trash2, Pencil, Download } from "lucide-react"
 
-const LS_KEY = 'crosshairLibrary'
+const LS_KEY = "crosshairLibrary"
 
 function loadLibrary(): CrosshairLibraryItem[] {
   try {
@@ -36,7 +36,7 @@ function Discover() {
 
   useEffect(() => {
     setLibrary(loadLibrary())
-    const savedRaw = localStorage.getItem('currentConfig')
+    const savedRaw = localStorage.getItem("currentConfig")
     if (savedRaw) {
       try {
         const saved = JSON.parse(savedRaw)
@@ -58,20 +58,20 @@ function Discover() {
   }
 
   const applyConfig = async (cfg: CrosshairConfig) => {
-    localStorage.setItem('currentConfig', JSON.stringify(cfg))
+    localStorage.setItem("currentConfig", JSON.stringify(cfg))
     setCurrent(cfg)
-    await window.electron.ipcRenderer.invoke('overlay:update-config', cfg)
+    await window.electron.ipcRenderer.invoke("overlay:update-config", cfg)
   }
 
   const importPresetFile = async () => {
     const imported = (await window.electron.ipcRenderer.invoke(
-      'config:import'
+      "config:import"
     )) as CrosshairConfig | null
-    if (imported) addPresetToLibrary({ ...defaultConfig, ...imported }, 'Imported')
+    if (imported) addPresetToLibrary({ ...defaultConfig, ...imported }, "Imported")
   }
 
   const exportItem = async (item: CrosshairLibraryItem) => {
-    await window.electron.ipcRenderer.invoke('config:export', item.config)
+    await window.electron.ipcRenderer.invoke("config:export", item.config)
   }
 
   const deleteItem = (id: string) => {
@@ -80,10 +80,10 @@ function Discover() {
     saveLibrary(next)
   }
 
-  const saveCurrentToLibrary = () => addPresetToLibrary(current, 'Current Config')
+  const saveCurrentToLibrary = () => addPresetToLibrary(current, "Current Config")
 
   const editItem = (cfg: CrosshairConfig) => {
-    navigate('/editor', { state: { initialConfig: cfg } })
+    navigate("/editor", { state: { initialConfig: cfg } })
   }
 
   const scaleConfigForPreview = (cfg: CrosshairConfig, size: number): CrosshairConfig => {

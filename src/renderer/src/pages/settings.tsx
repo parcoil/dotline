@@ -1,31 +1,31 @@
-import { useEffect, useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
-import { Button } from '@/components/ui/button'
+import { useEffect, useState } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Label } from "@/components/ui/label"
+import { Switch } from "@/components/ui/switch"
+// import { Button } from "@/components/ui/button"
 
 function Settings() {
   const [rpcEnabled, setRpcEnabled] = useState<boolean>(true)
 
   useEffect(() => {
-    const disabled = localStorage.getItem('discordRpcDisabled')
-    setRpcEnabled(!(disabled === 'true'))
+    const disabled = localStorage.getItem("discordRpcDisabled")
+    setRpcEnabled(!(disabled === "true"))
   }, [])
 
   const handleToggleRpc = async (checked: boolean) => {
     setRpcEnabled(checked)
     if (checked) {
-      localStorage.removeItem('discordRpcDisabled')
-      await window.electron.ipcRenderer.invoke('start-discord-rpc')
+      localStorage.removeItem("discordRpcDisabled")
+      await window.electron.ipcRenderer.invoke("start-discord-rpc")
     } else {
-      localStorage.setItem('discordRpcDisabled', 'true')
-      await window.electron.ipcRenderer.invoke('stop-discord-rpc')
+      localStorage.setItem("discordRpcDisabled", "true")
+      await window.electron.ipcRenderer.invoke("stop-discord-rpc")
     }
   }
 
-  const openLogs = async () => {
-    await window.electron.ipcRenderer.invoke('app:open-logs')
-  }
+  // const openLogs = async () => {
+  //   await window.electron.ipcRenderer.invoke('app:open-logs')
+  // }
 
   return (
     <div className="max-w-3xl mx-auto space-y-4">
