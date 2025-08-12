@@ -30,6 +30,9 @@ function Titlebar() {
       <div className="flex items-center gap-2 text-base font-semibold">
         <img src={dotlineImage} alt="" className="w-5 h-5" />
         Dotline
+        <div className="rounded-full bg-accent pl-2 pr-2 text-xs pt-1 pb-1 ">
+          <p>Alpha</p>
+        </div>
         <p className="text-sm text-muted-foreground">v{data.version}</p>
       </div>
       {/* @ts-ignore */}

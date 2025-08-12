@@ -116,7 +116,7 @@ function Discover() {
     <Card className="group">
       <CardContent className="pt-4 space-y-2 flex flex-col items-center">
         <div
-          className="rounded-md border bg-background relative flex items-center justify-center shadow-sm transition-shadow group-hover:shadow-md"
+          className="rounded-md border bg-foreground/40 dark:bg-background relative flex items-center justify-center shadow-sm transition-shadow group-hover:shadow-md"
           style={{ width: previewSize, height: previewSize }}
         >
           <Crosshair mode="embed" config={scaleConfigForPreview(config, previewSize)} />
@@ -153,10 +153,16 @@ function Discover() {
 
       <Tabs defaultValue="library">
         <TabsList>
-          <TabsTrigger value="library">
+          <TabsTrigger
+            value="library"
+            className="dark:data-[state=active]:bg-primary dark:data-[state=active]:text-primary-foreground"
+          >
             <Home className="w-4 h-4 mr-2" /> Library
           </TabsTrigger>
-          <TabsTrigger value="presets">
+          <TabsTrigger
+            value="presets"
+            className="dark:data-[state=active]:bg-primary dark:data-[state=active]:text-primary-foreground"
+          >
             <Paintbrush className="w-4 h-4 mr-2" /> Presets
           </TabsTrigger>
         </TabsList>
