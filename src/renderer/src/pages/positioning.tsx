@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import type { CrosshairConfig } from "@/types/crosshair"
 import { defaultConfig } from "@/types/crosshair"
 import { Crosshair } from "@/components/crosshair"
+import { toast } from "sonner"
 import {
   Select,
   SelectContent,
@@ -58,10 +59,16 @@ function Positioning(): React.ReactElement {
   }
 
   const saveAndApply = async (): Promise<void> => {
-    localStorage.setItem("currentConfig", JSON.stringify(config))
-    await window.electron.ipcRenderer.invoke("overlay:update-config", config)
-    if (config.overlayDisplayId) {
-      await window.electron.ipcRenderer.invoke("overlay:set-display", config.overlayDisplayId)
+    try {
+      localStorage.setItem("currentConfig", JSON.stringify(config))
+      await window.electron.ipcRenderer.invoke("overlay:update-config", config)
+      if (config.overlayDisplayId) {
+        await window.electron.ipcRenderer.invoke("overlay:set-display", config.overlayDisplayId)
+      }
+      toast.success("Configuration applied successfully!")
+    } catch (error) {
+      console.error("Failed to apply configuration:", error)
+      toast.error("Failed to apply configuration.")
     }
   }
 
@@ -82,7 +89,13 @@ function Positioning(): React.ReactElement {
       <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <h1 className="text-3xl font-bold tracking-tight">Positioning</h1>
         <div className="flex flex-wrap gap-3">
-          <Button variant="outline" onClick={() => setConfig(defaultConfig)}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setConfig(defaultConfig)
+              toast("Settings reset to default.")
+            }}
+          >
             Reset
           </Button>
           <Button onClick={saveAndApply}>Apply</Button>
@@ -170,7 +183,13 @@ function Positioning(): React.ReactElement {
       </Card>
 
       <div className="flex gap-2 justify-center">
-        <Button variant="outline" onClick={() => setConfig(defaultConfig)}>
+        <Button
+          variant="outline"
+          onClick={() => {
+            setConfig(defaultConfig)
+            toast("Settings reset to default.")
+          }}
+        >
           Reset
         </Button>
         <Button onClick={saveAndApply}>Apply</Button>

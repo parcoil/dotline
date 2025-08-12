@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select"
 import { Crosshair } from "@/components/crosshair"
 import { useLocation } from "react-router"
+import { toast } from "sonner"
 
 function Editor() {
   const location = useLocation()
@@ -44,10 +45,16 @@ function Editor() {
   const save = async () => {
     localStorage.setItem("currentConfig", JSON.stringify(config))
     await window.electron.ipcRenderer.invoke("overlay:update-config", config)
+    toast.success("Applied current config")
   }
 
   const handleExport = async () => {
-    await window.electron.ipcRenderer.invoke("config:export", config)
+    try {
+      await window.electron.ipcRenderer.invoke("config:export", config)
+      toast.success("Exported current config")
+    } catch {
+      toast.error("Failed to export config")
+    }
   }
 
   const handleImport = async () => {
@@ -56,6 +63,9 @@ function Editor() {
       setConfig(imported as CrosshairConfig)
       localStorage.setItem("currentConfig", JSON.stringify(imported))
       await window.electron.ipcRenderer.invoke("overlay:update-config", imported as CrosshairConfig)
+      toast.success("Imported config successfully")
+    } else {
+      toast.error("Import cancelled or failed")
     }
   }
 
@@ -88,6 +98,7 @@ function Editor() {
     const next = [item, ...library]
     saveLibrary(next)
     setSaveName("")
+    toast.success(`Saved "${item.name}" to library`)
   }
 
   const scaleConfigForPreview = (cfg: CrosshairConfig, size: number): CrosshairConfig => {

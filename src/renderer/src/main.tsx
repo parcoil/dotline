@@ -1,22 +1,34 @@
-import './index.css'
-import { ThemeProvider } from './components/theme-provider'
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import App from './App'
-import { HashRouter as Router } from 'react-router'
+import "./index.css"
+import { ThemeProvider } from "./components/theme-provider"
+import { StrictMode } from "react"
+import { createRoot } from "react-dom/client"
+import App from "./App"
+import { HashRouter as Router } from "react-router"
+import { PostHogProvider } from "posthog-js/react"
 
-const params = new URLSearchParams(window.location.search)
-const isOverlay = params.get('overlay') === '1'
-
-if (isOverlay) {
-  document.body.style.background = 'transparent'
+const options = {
+  api_host: "https://us.i.posthog.com",
+  defaults: "2025-05-24"
 }
 
-createRoot(document.getElementById('root')!).render(
+const params = new URLSearchParams(window.location.search)
+const isOverlay = params.get("overlay") === "1"
+
+if (isOverlay) {
+  document.body.style.background = "transparent"
+}
+
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ThemeProvider defaultTheme="system">
       <Router>
-        <App />
+        <PostHogProvider
+          apiKey={"phc_yrKFrR0A214eflXwdPzDQ1Esf7qtw7USy0Zg8TdbqCT"}
+          //@ts-ignore
+          options={options}
+        >
+          <App />
+        </PostHogProvider>
       </Router>
     </ThemeProvider>
   </StrictMode>

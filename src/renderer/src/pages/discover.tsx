@@ -9,6 +9,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { presets } from "@/lib/presets"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Home, Paintbrush, Import, Save, Trash2, Pencil, Download } from "lucide-react"
+import { toast } from "sonner"
 
 const LS_KEY = "crosshairLibrary"
 
@@ -55,32 +56,46 @@ function Discover() {
     const next = [item, ...library]
     setLibrary(next)
     saveLibrary(next)
+    toast.success(`Preset "${item.name}" added to library`)
   }
 
   const applyConfig = async (cfg: CrosshairConfig) => {
     localStorage.setItem("currentConfig", JSON.stringify(cfg))
     setCurrent(cfg)
     await window.electron.ipcRenderer.invoke("overlay:update-config", cfg)
+    toast.success("Crosshair applied")
   }
 
   const importPresetFile = async () => {
     const imported = (await window.electron.ipcRenderer.invoke(
       "config:import"
     )) as CrosshairConfig | null
-    if (imported) addPresetToLibrary({ ...defaultConfig, ...imported }, "Imported")
+    if (imported) {
+      addPresetToLibrary({ ...defaultConfig, ...imported }, "Imported")
+      toast.success("Preset imported successfully")
+    } else {
+      toast.error("Failed to import preset")
+    }
   }
-
   const exportItem = async (item: CrosshairLibraryItem) => {
-    await window.electron.ipcRenderer.invoke("config:export", item.config)
+    try {
+      await window.electron.ipcRenderer.invoke("config:export", item.config)
+      toast.success(`Exported "${item.name}"`)
+    } catch {
+      toast.error("Failed to export preset")
+    }
   }
-
   const deleteItem = (id: string) => {
     const next = library.filter((i) => i.id !== id)
     setLibrary(next)
     saveLibrary(next)
+    toast.success("Preset deleted")
   }
 
-  const saveCurrentToLibrary = () => addPresetToLibrary(current, "Current Config")
+  const saveCurrentToLibrary = () => {
+    addPresetToLibrary(current, "Current Config")
+    toast.success("Current config saved to library")
+  }
 
   const editItem = (cfg: CrosshairConfig) => {
     navigate("/editor", { state: { initialConfig: cfg } })
