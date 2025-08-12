@@ -16,6 +16,12 @@
 - 📂 Import & Export your configs
 - 🐧 Cross-Platform
 
+### Supported Oses
+
+- Windows: ✅ (Tested on Windows 11 24H2)
+- Linux: ✅ (Tested on arch linux with kde)
+- MacOS ⚠️ (Seems to work. must build yourself, tested on MacOS sequoia)
+
 ### 🎯 Adding Preset crosshairs
 
 Preset crosshairs are located in `src/renderer/src/lib/presets.ts`.
