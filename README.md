@@ -19,7 +19,7 @@
 ### Supported Oses
 
 - Windows: ✅ (Tested on Windows 11 24H2)
-- Linux: ✅ (Tested on arch linux with kde)
+- Linux: ✅ (Tested on Arch Linux on KDE)
 - MacOS ⚠️ (Seems to work. must build yourself, tested on MacOS sequoia)
 
 ### 🎯 Adding Preset crosshairs
