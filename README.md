@@ -1,5 +1,5 @@
 <div align="center">
-<img src="./resources/dotline.png" width="60" height="60" />
+<img src="./resources/dotline.png" width="100" height="100" />
 
 <h1>Dotline</h1>
 
