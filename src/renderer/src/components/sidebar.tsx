@@ -27,6 +27,36 @@ function Sidebar() {
 
   const footerItems = [{ to: "/settings", label: "Settings", icon: <Settings size={18} /> }]
 
+  const linkClasses = ({ isActive }) =>
+    cn(
+      "group relative flex items-center rounded-md px-2.5 py-2 text-sm transition-all active:scale-95 gap-2",
+      isActive ? "bg-primary text-primary-foreground" : "hover:bg-accent hover:text-accent-foreground"
+    )
+
+  const Label = ({ children }) => (
+    <span
+      className={cn(
+        "whitespace-nowrap transition-opacity duration-200",
+        collapsed ? "opacity-0 overflow-hidden w-0" : "opacity-100 w-auto"
+      )}
+    >
+      {children}
+    </span>
+  )
+// use custom tooltip and not shadcn to fit the sidebar style
+  const Tooltip = ({ text }) =>
+    collapsed ? (
+      <span
+        className={cn(
+          "pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50",
+          "rounded-md bg-popover text-popover-foreground px-2 py-1 text-xs shadow",
+          "opacity-0 scale-95 transition group-hover:opacity-100 group-hover:scale-100"
+        )}
+      >
+        {text}
+      </span>
+    ) : null
+
   return (
     <aside
       className={cn(
@@ -35,82 +65,44 @@ function Sidebar() {
       )}
     >
       <div className={cn("flex items-center justify-between p-2", collapsed && "border-b")}>
-        <Button variant="ghost" onClick={() => setCollapsed(!collapsed)}>
-          {collapsed ? <Menu size={18} /> : <Menu size={18} />}
+        <Button variant="ghost" onClick={() => setCollapsed(!collapsed)} aria-label="Toggle sidebar">
+          <Menu size={18} />
         </Button>
       </div>
 
       <nav className="flex flex-col gap-1 p-2">
         {navItems.map(({ to, label, icon }) => (
-          <NavLink
-            key={to}
-            to={to}
-            className={({ isActive }) =>
-              cn(
-                "flex items-center rounded-md px-2.5 py-2 text-sm transition-all active:scale-95 gap-2",
-                isActive
-                  ? "bg-primary text-primary-foreground"
-                  : "hover:bg-accent hover:text-accent-foreground"
-              )
-            }
-          >
+          <NavLink key={to} to={to} className={linkClasses} aria-label={collapsed ? label : undefined}>
             <span className="flex items-center justify-center w-5 h-5">{icon}</span>
-            <span
-              className={cn(
-                "whitespace-nowrap transition-opacity duration-200",
-                collapsed ? "opacity-0 overflow-hidden w-0" : "opacity-100 w-auto"
-              )}
-            >
-              {label}
-            </span>
+            <Label>{label}</Label>
+            <Tooltip text={label} />
           </NavLink>
         ))}
       </nav>
 
       <nav className="flex flex-col gap-1 p-2 mt-auto border-t">
         {footerItems.map(({ to, label, icon }) => (
-          <NavLink
-            key={to}
-            to={to}
-            className={({ isActive }) =>
-              cn(
-                "flex items-center rounded-md px-2.5 py-2 text-sm transition-all active:scale-95 gap-2",
-                isActive
-                  ? "bg-primary text-primary-foreground"
-                  : "hover:bg-accent hover:text-accent-foreground"
-              )
-            }
-          >
+          <NavLink key={to} to={to} className={linkClasses} aria-label={collapsed ? label : undefined}>
             <span className="flex items-center justify-center w-5 h-5">{icon}</span>
-            <span
-              className={cn(
-                "whitespace-nowrap transition-opacity duration-200",
-                collapsed ? "opacity-0 overflow-hidden w-0" : "opacity-100 w-auto"
-              )}
-            >
-              {label}
-            </span>
+            <Label>{label}</Label>
+            <Tooltip text={label} />
           </NavLink>
         ))}
+
         <a
           href="https://discord.com/invite/En5YJYWj3Z"
           target="_blank"
           className={cn(
-            "flex items-center rounded-md px-2.5 py-2 text-sm transition-all active:scale-95 gap-2",
+            "group relative flex items-center rounded-md px-2.5 py-2 text-sm transition-all active:scale-95 gap-2",
             "hover:bg-accent hover:text-accent-foreground"
           )}
+          aria-label={collapsed ? "Discord" : undefined}
         >
           <span className="flex items-center justify-center">
             <Discord className="w-5 h-5 fill-primary" />
           </span>
-          <span
-            className={cn(
-              "whitespace-nowrap transition-opacity duration-200",
-              collapsed ? "opacity-0 overflow-hidden w-0" : "opacity-100 w-auto"
-            )}
-          >
-            Discord
-          </span>
+          <Label>Discord</Label>
+          <Tooltip text="Discord" />
         </a>
       </nav>
     </aside>

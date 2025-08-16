@@ -22,7 +22,6 @@ function Titlebar() {
         WebkitAppRegion: "drag",
         userSelect: "none",
         height: 42,
-        // Expose a CSS var so sidebar can offset below titlebar
         /* @ts-ignore */
         ["--titlebar-height" as any]: "42px"
       }}
