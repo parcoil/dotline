@@ -21,7 +21,12 @@ import { toast } from "sonner"
 
 function Editor() {
   const location = useLocation()
-  const navInitial = (location.state as any)?.initialConfig as CrosshairConfig | undefined
+  type EditorNavState = { initialConfig?: CrosshairConfig; itemId?: string; itemName?: string }
+  const state = (location.state ?? {}) as EditorNavState
+  const navInitial = state.initialConfig
+  const editingItemId = state.itemId
+  const editingItemName = state.itemName
+  const editingExisting = !!editingItemId
   const [config, setConfig] = useState<CrosshairConfig>(navInitial ?? defaultConfig)
   const [saveName, setSaveName] = useState<string>("")
 
@@ -38,17 +43,41 @@ function Editor() {
     }
   }, [])
 
-  const handleChange = <K extends keyof CrosshairConfig>(key: K, value: CrosshairConfig[K]) => {
+  const handleChange = <K extends keyof CrosshairConfig>(key: K, value: CrosshairConfig[K]): void => {
     setConfig((c) => ({ ...c, [key]: value }))
   }
 
-  const save = async () => {
+  const save = async (): Promise<void> => {
     localStorage.setItem("currentConfig", JSON.stringify(config))
     await window.electron.ipcRenderer.invoke("overlay:update-config", config)
     toast.success("Applied current config")
   }
 
-  const handleExport = async () => {
+  const saveOverwriteOrNew = (): void => {
+    if (editingExisting && editingItemId) {
+      const library = loadLibrary()
+      const idx = library.findIndex((i) => i.id === editingItemId)
+      if (idx !== -1) {
+        library[idx] = { ...library[idx], config }
+        saveLibrary(library)
+        toast.success(`Saved to "${editingItemName || library[idx].name}"`)
+        return
+      }
+    }
+    const library = loadLibrary()
+    const item: CrosshairLibraryItem = {
+      id: makeId(),
+      name: saveName && saveName.trim() ? saveName.trim() : `Crosshair ${library.length + 1}`,
+      createdAt: Date.now(),
+      config
+    }
+    const next = [item, ...library]
+    saveLibrary(next)
+    setSaveName("")
+    toast.success(`Saved "${item.name}" to library`)
+  }
+
+  const handleExport = async (): Promise<void> => {
     try {
       await window.electron.ipcRenderer.invoke("config:export", config)
       toast.success("Exported current config")
@@ -57,7 +86,7 @@ function Editor() {
     }
   }
 
-  const handleImport = async () => {
+  const handleImport = async (): Promise<void> => {
     const imported = await window.electron.ipcRenderer.invoke("config:import")
     if (imported) {
       setConfig(imported as CrosshairConfig)
@@ -81,10 +110,10 @@ function Editor() {
       return []
     }
   }
-  function saveLibrary(items: CrosshairLibraryItem[]) {
+  function saveLibrary(items: CrosshairLibraryItem[]): void {
     localStorage.setItem(LS_KEY, JSON.stringify(items))
   }
-  function makeId() {
+  function makeId(): string {
     return Math.random().toString(36).slice(2, 10)
   }
   const saveToLibrary = () => {
@@ -116,12 +145,20 @@ function Editor() {
   return (
     <div className="max-w-3xl mx-auto space-y-4">
       <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <h1 className="text-3xl font-bold tracking-tight">Editor</h1>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Editor</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            {editingExisting
+              ? `Editing: ${editingItemName ?? "Saved crosshair"}`
+              : "Editing: New crosshair"}
+          </p>
+        </div>
         <div className="flex flex-wrap gap-3">
           <Button variant="outline" onClick={() => setConfig(defaultConfig)}>
             Reset
           </Button>
-          <Button onClick={save}>Apply to current</Button>
+          <Button onClick={save}>Apply to Current</Button>
+          <Button variant="outline" onClick={saveOverwriteOrNew}>{editingItemName ? `Update "${editingItemName}"` : "Save to library"}</Button>
         </div>
       </header>
       <Card>
@@ -265,7 +302,7 @@ function Editor() {
             value={saveName}
             onChange={(e) => setSaveName(e.target.value)}
           />
-          <Button onClick={saveToLibrary}>Save</Button>
+          <Button onClick={saveToLibrary}>{editingExisting ? "Save as New" : "Save"}</Button>
         </CardContent>
       </Card>
     </div>

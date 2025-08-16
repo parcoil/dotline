@@ -97,8 +97,10 @@ function Discover() {
     toast.success("Current config saved to library")
   }
 
-  const editItem = (cfg: CrosshairConfig) => {
-    navigate("/editor", { state: { initialConfig: cfg } })
+  const editItem = (item: CrosshairLibraryItem) => {
+    navigate("/editor", {
+      state: { itemId: item.id, initialConfig: item.config, itemName: item.name }
+    })
   }
 
   const scaleConfigForPreview = (cfg: CrosshairConfig, size: number): CrosshairConfig => {
@@ -202,7 +204,7 @@ function Discover() {
                         Apply
                       </Button>
                       <TooltipButton label="Edit this crosshair">
-                        <Button size="sm" variant="secondary" onClick={() => editItem(item.config)}>
+                        <Button size="sm" variant="secondary" onClick={() => editItem(item)}>
                           <Pencil className="w-4 h-4" />
                         </Button>
                       </TooltipButton>
