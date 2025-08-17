@@ -13,7 +13,17 @@ export const presets: { name: string; config: CrosshairConfig }[] = [
   },
   {
     name: "Tiny Dot",
-    config: { ...defaultConfig, style: "dot", thickness: 2, color: "#ffffff", creator: "Parcoil" }
+    config: {
+      ...defaultConfig,
+      style: "dot",
+      thickness: 2,
+      color: "#ffffff",
+      creator: "Parcoil",
+      outline: true,
+      outlineColor: "#000",
+      outlineThickness: 1.5,
+      outlineOpacity: 1
+    }
   },
   {
     name: "Compact Red",
@@ -52,6 +62,22 @@ export const presets: { name: string; config: CrosshairConfig }[] = [
     }
   },
   {
+    name: "Minimal Gray",
+    config: {
+      ...defaultConfig,
+      style: "classic",
+      color: "#cccccc",
+      thickness: 1,
+      length: 4,
+      gap: 1,
+      opacity: 0.5,
+      centerDot: false,
+      outline: false,
+      creator: "Parcoil"
+    }
+  },
+
+  {
     name: "X Neon",
     config: {
       ...defaultConfig,
@@ -59,6 +85,22 @@ export const presets: { name: string; config: CrosshairConfig }[] = [
       color: "#00e5ff",
       thickness: 2,
       gap: 3,
+      creator: "Parcoil"
+    }
+  },
+  {
+    name: "Sniper Blue",
+    config: {
+      ...defaultConfig,
+      style: "classic",
+      color: "#00bfff",
+      thickness: 1,
+      length: 12,
+      gap: 20,
+      opacity: 0.8,
+      centerDot: true,
+      centerDotSize: 3,
+      centerDotColor: "#00bfff",
       creator: "Parcoil"
     }
   },
