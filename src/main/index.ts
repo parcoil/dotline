@@ -7,44 +7,7 @@ import { createAppTray, notifyMinimizedToTrayOnce } from "./tray"
 import "./rpc"
 import { promises as fs } from "fs"
 import { initAutoUpdater, triggerAutoUpdateCheck } from "./updater"
-
-// will move all types into a types folder next commit
-type CrosshairStyle = "classic" | "dot" | "circle" | "x"
-
-type CrosshairConfig = {
-  enabled: boolean
-  style: CrosshairStyle
-  color: string
-  opacity: number
-  thickness: number
-  length: number
-  gap: number
-  centerDot?: boolean
-  centerDotSize?: number
-  centerDotOpacity?: number
-  centerDotThickness?: number
-  centerDotColor?: string
-  centerDotShape?: "circle" | "square"
-  outline?: boolean
-  outlineColor?: string
-  outlineThickness?: number
-  outlineOpacity?: number
-  creator?: string
-  overlayDisplayId?: number
-  offsetX?: number
-  offsetY?: number
-}
-
-const defaultConfig: CrosshairConfig = {
-  enabled: true,
-  style: "classic",
-  color: "#22C55E",
-  opacity: 1,
-  thickness: 2,
-  length: 5,
-  gap: 0,
-  centerDot: false
-}
+import { CrosshairConfig, CrosshairStyle, defaultConfig } from "@/types/crosshair"
 
 let settingsWindow: BrowserWindow | null = null
 let overlayWindow: BrowserWindow | null = null
@@ -72,13 +35,6 @@ function createSettingsWindow(): void {
   settingsWindow.on("ready-to-show", () => {
     settingsWindow?.show()
   })
-
-  // settingsWindow.on("close", (e) => {
-  //   // Hide to tray instead of closing the app
-  //   e.preventDefault()
-  //   settingsWindow?.hide()
-  //   notifyMinimizedToTrayOnce()
-  // })
 
   settingsWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
@@ -301,14 +257,13 @@ ipcMain.handle("config:import", async () => {
 
     const allowedStyles: CrosshairStyle[] = ["classic", "dot", "circle", "x"]
 
-    // Merge with defaultConfig, fallback to defaults for missing fields
+    // merge with defaultConfig, fallback to defaults for missing fields
     const cfg: CrosshairConfig = {
       ...defaultConfig,
       ...parsed,
       style: allowedStyles.includes(parsed.style) ? parsed.style : defaultConfig.style
     }
 
-    // Minimal validation
     if (
       typeof cfg.enabled !== "boolean" ||
       typeof cfg.color !== "string" ||

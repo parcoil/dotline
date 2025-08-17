@@ -1,5 +1,5 @@
 import { useMemo } from "react"
-import type { CrosshairConfig } from "../types/crosshair"
+import type { CrosshairConfig } from "../../../types/crosshair"
 
 export function Crosshair({
   config,

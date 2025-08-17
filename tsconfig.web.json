@@ -3,14 +3,16 @@
   "include": [
     "src/renderer/src/env.d.ts",
     "src/renderer/src/**/*",
-    "src/preload/*.d.ts"
+    "src/preload/*.d.ts",
+    "src/types/**/*"
   ],
   "compilerOptions": {
     "composite": true,
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/renderer/src/*"]
+      "@/*": ["src/renderer/src/*"],
+      "@/types/*": ["src/types/*"]
     },
     "strict": true,
     "moduleResolution": "node",

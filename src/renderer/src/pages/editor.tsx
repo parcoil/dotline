@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react"
-import { CrosshairConfig } from "../types/crosshair"
-import type { CrosshairLibraryItem } from "../types/crosshair"
+import { CrosshairConfig } from "../../../types/crosshair"
+import type { CrosshairLibraryItem } from "../../../types/crosshair"
 import { Label } from "../components/ui/label"
 import { Input } from "../components/ui/input"
 import { Slider } from "../components/ui/slider"
 import { Button } from "../components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "../components/ui/card"
-import { defaultConfig } from "../types/crosshair"
+import { defaultConfig } from "../../../types/crosshair"
 import { Switch } from "@/components/ui/switch"
 import {
   Select,

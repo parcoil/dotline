@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { Routes, Route } from "react-router"
 import { Crosshair } from "@/components/crosshair"
-import type { CrosshairConfig } from "@/types/crosshair"
+import { CrosshairConfig } from "@/types/crosshair"
 import { defaultConfig } from "@/types/crosshair"
 import Editor from "@/pages/editor"
 import Discover from "@/pages/discover"
