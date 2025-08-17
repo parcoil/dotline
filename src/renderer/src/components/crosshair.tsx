@@ -1,32 +1,65 @@
-import { useMemo } from 'react'
-import type { CrosshairConfig } from '../types/crosshair'
+import { useMemo } from "react"
+import type { CrosshairConfig } from "../types/crosshair"
 
 export function Crosshair({
   config,
-  mode = 'overlay'
+  mode = "overlay"
 }: {
   config: CrosshairConfig
-  mode?: 'overlay' | 'embed'
+  mode?: "overlay" | "embed"
 }) {
+  const outlineWithOpacity =
+    config.outline && config.outlineColor
+      ? hexToRgba(config.outlineColor, config.outlineOpacity ?? 1)
+      : undefined
+
+  const renderRect = (x: number, y: number, width: number, height: number, rotate?: number) => {
+    const outlineThickness = config.outlineThickness ?? 1
+    const hasOutline = config.outline && config.outlineColor
+
+    return (
+      <>
+        {hasOutline && (
+          <rect
+            x={x - outlineThickness / 2}
+            y={y - outlineThickness / 2}
+            width={width + outlineThickness}
+            height={height + outlineThickness}
+            fill={hexToRgba(config.outlineColor!, config.outlineOpacity ?? 1)}
+            transform={rotate ? `rotate(${rotate} ${center} ${center})` : undefined}
+          />
+        )}
+        <rect
+          x={x}
+          y={y}
+          width={width}
+          height={height}
+          fill={colorWithOpacity}
+          transform={rotate ? `rotate(${rotate} ${center} ${center})` : undefined}
+        />
+      </>
+    )
+  }
+
   const style = useMemo(() => {
-    const isEmbed = mode === 'embed'
+    const isEmbed = mode === "embed"
     const left = config.offsetX ?? 0
     const top = config.offsetY ?? 0
     return isEmbed
       ? {
-          position: 'absolute' as const,
+          position: "absolute" as const,
           inset: 0,
-          pointerEvents: 'none' as const,
-          background: 'transparent'
+          pointerEvents: "none" as const,
+          background: "transparent"
         }
       : {
-          position: 'fixed' as const,
+          position: "fixed" as const,
           left: 0,
           top: 0,
-          width: '100%',
-          height: '100%',
-          pointerEvents: 'none' as const,
-          background: 'transparent',
+          width: "100%",
+          height: "100%",
+          pointerEvents: "none" as const,
+          background: "transparent",
           transform: `translate(${left}px, ${top}px)`
         }
   }, [mode, config.offsetX, config.offsetY])
@@ -39,72 +72,93 @@ export function Crosshair({
   const size = Math.max((config.length + config.gap) * 2 + config.thickness * 2, 64)
   const center = size / 2
 
+  const renderCenterDot = () => {
+    if (!config.centerDot) return null
+    const dotColor = hexToRgba(
+      config.centerDotColor ?? config.color,
+      config.centerDotOpacity ?? config.opacity
+    )
+    const dotSize = config.centerDotSize ?? Math.max(1, config.thickness / 2)
+
+    return config.centerDotShape === "square" ? (
+      <rect
+        x={center - dotSize / 2}
+        y={center - dotSize / 2}
+        width={dotSize}
+        height={dotSize}
+        fill={dotColor}
+        stroke={outlineWithOpacity}
+        strokeWidth={config.outlineThickness ?? 1}
+      />
+    ) : (
+      <circle
+        cx={center}
+        cy={center}
+        r={dotSize}
+        fill={dotColor}
+        stroke={outlineWithOpacity}
+        strokeWidth={config.outlineThickness ?? 1}
+      />
+    )
+  }
+
   return (
-    <div style={{ ...style, position: mode === 'embed' ? 'absolute' : ('fixed' as const) }}>
+    <div style={{ ...style, position: mode === "embed" ? "absolute" : ("fixed" as const) }}>
       <svg
         width={size}
         height={size}
         style={
-          mode === 'embed'
+          mode === "embed"
             ? {
-                position: 'absolute',
-                left: '50%',
-                top: '50%',
-                transform: `translate(-50%, -50%) translate(${config.offsetX ?? 0}px, ${
-                  config.offsetY ?? 0
-                }px)`
+                position: "absolute",
+                left: "50%",
+                top: "50%",
+                transform: `translate(-50%, -50%) translate(${config.offsetX ?? 0}px, ${config.offsetY ?? 0}px)`
               }
-            : {
-                position: 'absolute',
-                left: '50%',
-                top: '50%',
-                transform: 'translate(-50%, -50%)'
-              }
+            : { position: "absolute", left: "50%", top: "50%", transform: "translate(-50%, -50%)" }
         }
       >
-        {config.style === 'classic' && (
+        {config.style === "classic" && (
           <>
-            <rect
-              x={center - config.gap - config.length}
-              y={center - config.thickness / 2}
-              width={config.length}
-              height={config.thickness}
-              fill={colorWithOpacity}
-            />
-            <rect
-              x={center + config.gap}
-              y={center - config.thickness / 2}
-              width={config.length}
-              height={config.thickness}
-              fill={colorWithOpacity}
-            />
-            <rect
-              x={center - config.thickness / 2}
-              y={center - config.gap - config.length}
-              width={config.thickness}
-              height={config.length}
-              fill={colorWithOpacity}
-            />
-            <rect
-              x={center - config.thickness / 2}
-              y={center + config.gap}
-              width={config.thickness}
-              height={config.length}
-              fill={colorWithOpacity}
-            />
+            {renderRect(
+              center - config.gap - config.length,
+              center - config.thickness / 2,
+              config.length,
+              config.thickness
+            )}
+            {renderRect(
+              center + config.gap,
+              center - config.thickness / 2,
+              config.length,
+              config.thickness
+            )}
+            {renderRect(
+              center - config.thickness / 2,
+              center - config.gap - config.length,
+              config.thickness,
+              config.length
+            )}
+            {renderRect(
+              center - config.thickness / 2,
+              center + config.gap,
+              config.thickness,
+              config.length
+            )}
           </>
         )}
 
-        {config.style === 'dot' && (
+        {config.style === "dot" && (
           <circle
             cx={center}
             cy={center}
             r={Math.max(1, config.thickness)}
             fill={colorWithOpacity}
+            stroke={outlineWithOpacity}
+            strokeWidth={config.outlineThickness ?? 1}
           />
         )}
 
-        {config.style === 'circle' && (
+        {config.style === "circle" && (
           <circle
             cx={center}
             cy={center}
@@ -115,51 +169,40 @@ export function Crosshair({
           />
         )}
 
-        {config.style === 'x' && (
+        {config.style === "x" && (
           <>
-            <rect
-              x={center - config.thickness / 2}
-              y={center - config.length - config.gap}
-              width={config.thickness}
-              height={config.length}
-              transform={`rotate(45 ${center} ${center})`}
-              fill={colorWithOpacity}
-            />
-            <rect
-              x={center - config.thickness / 2}
-              y={center + config.gap}
-              width={config.thickness}
-              height={config.length}
-              transform={`rotate(45 ${center} ${center})`}
-              fill={colorWithOpacity}
-            />
-            <rect
-              x={center - config.thickness / 2}
-              y={center - config.length - config.gap}
-              width={config.thickness}
-              height={config.length}
-              transform={`rotate(-45 ${center} ${center})`}
-              fill={colorWithOpacity}
-            />
-            <rect
-              x={center - config.thickness / 2}
-              y={center + config.gap}
-              width={config.thickness}
-              height={config.length}
-              transform={`rotate(-45 ${center} ${center})`}
-              fill={colorWithOpacity}
-            />
+            {renderRect(
+              center - config.thickness / 2,
+              center - config.length - config.gap,
+              config.thickness,
+              config.length,
+              45
+            )}
+            {renderRect(
+              center - config.thickness / 2,
+              center + config.gap,
+              config.thickness,
+              config.length,
+              45
+            )}
+            {renderRect(
+              center - config.thickness / 2,
+              center - config.length - config.gap,
+              config.thickness,
+              config.length,
+              -45
+            )}
+            {renderRect(
+              center - config.thickness / 2,
+              center + config.gap,
+              config.thickness,
+              config.length,
+              -45
+            )}
           </>
         )}
 
-        {config.centerDot && (
-          <circle
-            cx={center}
-            cy={center}
-            r={Math.max(1, config.thickness / 2)}
-            fill={colorWithOpacity}
-          />
-        )}
+        {renderCenterDot()}
       </svg>
     </div>
   )
@@ -194,7 +237,7 @@ export function CrosshairPreview({
 }
 
 function hexToRgba(hex: string, alpha: number) {
-  const parsed = hex.replace('#', '')
+  const parsed = hex.replace("#", "")
   if (parsed.length !== 6) return `rgba(0, 0, 0, ${alpha})`
   const bigint = parseInt(parsed, 16)
   const r = (bigint >> 16) & 255

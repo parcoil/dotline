@@ -43,7 +43,10 @@ function Editor() {
     }
   }, [])
 
-  const handleChange = <K extends keyof CrosshairConfig>(key: K, value: CrosshairConfig[K]): void => {
+  const handleChange = <K extends keyof CrosshairConfig>(
+    key: K,
+    value: CrosshairConfig[K]
+  ): void => {
     setConfig((c) => ({ ...c, [key]: value }))
   }
 
@@ -158,7 +161,9 @@ function Editor() {
             Reset
           </Button>
           <Button onClick={save}>Apply to Current</Button>
-          <Button variant="outline" onClick={saveOverwriteOrNew}>{editingItemName ? `Update "${editingItemName}"` : "Save to library"}</Button>
+          <Button variant="outline" onClick={saveOverwriteOrNew}>
+            {editingItemName ? `Update "${editingItemName}"` : "Save to library"}
+          </Button>
         </div>
       </header>
       <Card>
@@ -269,6 +274,59 @@ function Editor() {
               step={1}
             />
           </div>
+          <div className="flex items-center justify-between">
+            <Label>Outline</Label>
+            <Switch
+              checked={config.outline ?? false}
+              onCheckedChange={(checked) => handleChange("outline", !!checked)}
+            />
+          </div>
+
+          {config.outline && (
+            <>
+              <div>
+                <Label>Outline Color</Label>
+                <Input
+                  type="color"
+                  value={config.outlineColor ?? "#000000"}
+                  onChange={(e) => handleChange("outlineColor", e.target.value)}
+                  className="w-20 h-10 p-0 border-none cursor-pointer mt-1"
+                />
+              </div>
+
+              <div className="gap-3 flex flex-col">
+                <div className="flex justify-between">
+                  <Label>Outline Thickness</Label>
+                  <span className="text-sm text-muted-foreground">
+                    {config.outlineThickness ?? 1}
+                  </span>
+                </div>
+                <Slider
+                  value={[config.outlineThickness ?? 1]}
+                  onValueChange={(val) => handleChange("outlineThickness", val[0])}
+                  min={1}
+                  max={10}
+                  step={1}
+                />
+              </div>
+
+              <div className="gap-3 flex flex-col">
+                <div className="flex justify-between">
+                  <Label>Outline Opacity</Label>
+                  <span className="text-sm text-muted-foreground">
+                    {config.outlineOpacity ?? 1}
+                  </span>
+                </div>
+                <Slider
+                  value={[config.outlineOpacity ?? 1]}
+                  onValueChange={(val) => handleChange("outlineOpacity", val[0])}
+                  min={0}
+                  max={1}
+                  step={0.01}
+                />
+              </div>
+            </>
+          )}
 
           <div className="flex items-center justify-between">
             <Label>Center Dot</Label>
@@ -277,6 +335,67 @@ function Editor() {
               onCheckedChange={(checked) => handleChange("centerDot", !!checked)}
             />
           </div>
+          {config.centerDot && (
+            <>
+              <div className="gap-3 flex flex-col">
+                <div className="flex justify-between">
+                  <Label>Center Dot Size</Label>
+                  <span className="text-sm text-muted-foreground">
+                    {config.centerDotSize ?? Math.max(1, config.thickness / 2)}
+                  </span>
+                </div>
+                <Slider
+                  value={[config.centerDotSize ?? Math.max(1, config.thickness / 2)]}
+                  onValueChange={(val) => handleChange("centerDotSize", val[0])}
+                  min={1}
+                  max={20}
+                  step={1}
+                />
+              </div>
+
+              <div>
+                <Label>Center Dot Color</Label>
+                <Input
+                  type="color"
+                  value={config.centerDotColor ?? config.color}
+                  onChange={(e) => handleChange("centerDotColor", e.target.value)}
+                  className="w-20 h-10 p-0 border-none cursor-pointer mt-1"
+                />
+              </div>
+
+              <div className="gap-3 flex flex-col">
+                <div className="flex justify-between">
+                  <Label>Center Dot Opacity</Label>
+                  <span className="text-sm text-muted-foreground">
+                    {(config.centerDotOpacity ?? config.opacity).toFixed(2)}
+                  </span>
+                </div>
+                <Slider
+                  value={[config.centerDotOpacity ?? config.opacity]}
+                  onValueChange={(val) => handleChange("centerDotOpacity", val[0])}
+                  min={0}
+                  max={1}
+                  step={0.01}
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <Label>Center Dot Shape</Label>
+                <Select
+                  value={config.centerDotShape ?? "circle"}
+                  onValueChange={(v) => handleChange("centerDotShape", v as "circle" | "square")}
+                >
+                  <SelectTrigger className="w-32">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="circle">Circle</SelectItem>
+                    <SelectItem value="square">Square</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </>
+          )}
         </CardContent>
       </Card>
 

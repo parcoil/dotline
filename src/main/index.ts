@@ -8,6 +8,7 @@ import "./rpc"
 import { promises as fs } from "fs"
 import { initAutoUpdater, triggerAutoUpdateCheck } from "./updater"
 
+// will move all types into a types folder next commit
 type CrosshairStyle = "classic" | "dot" | "circle" | "x"
 
 type CrosshairConfig = {
@@ -18,7 +19,31 @@ type CrosshairConfig = {
   thickness: number
   length: number
   gap: number
-  centerDot: boolean
+  centerDot?: boolean
+  centerDotSize?: number
+  centerDotOpacity?: number
+  centerDotThickness?: number
+  centerDotColor?: string
+  centerDotShape?: "circle" | "square"
+  outline?: boolean
+  outlineColor?: string
+  outlineThickness?: number
+  outlineOpacity?: number
+  creator?: string
+  overlayDisplayId?: number
+  offsetX?: number
+  offsetY?: number
+}
+
+const defaultConfig: CrosshairConfig = {
+  enabled: true,
+  style: "classic",
+  color: "#22C55E",
+  opacity: 1,
+  thickness: 2,
+  length: 5,
+  gap: 0,
+  centerDot: false
 }
 
 let settingsWindow: BrowserWindow | null = null
@@ -261,39 +286,37 @@ ipcMain.handle("config:import", async () => {
     properties: ["openFile"],
     filters: [{ name: "JSON Files", extensions: ["json"] }]
   }
+
   const result = settingsWindow
     ? await dialog.showOpenDialog(settingsWindow, options)
     : await dialog.showOpenDialog(options)
+
   if (result.canceled || result.filePaths.length === 0) return null
+
   try {
     const raw = await fs.readFile(result.filePaths[0], "utf-8")
     const parsed = JSON.parse(raw)
-    if (typeof parsed !== "object" || parsed === null) return null
+
+    if (!parsed || typeof parsed !== "object") return null
+
     const allowedStyles: CrosshairStyle[] = ["classic", "dot", "circle", "x"]
-    const style: CrosshairStyle = allowedStyles.includes((parsed as any).style)
-      ? (parsed as any).style
-      : "classic"
+
+    // Merge with defaultConfig, fallback to defaults for missing fields
+    const cfg: CrosshairConfig = {
+      ...defaultConfig,
+      ...parsed,
+      style: allowedStyles.includes(parsed.style) ? parsed.style : defaultConfig.style
+    }
+
+    // Minimal validation
     if (
-      typeof (parsed as any).enabled !== "boolean" ||
-      typeof (parsed as any).color !== "string" ||
-      typeof (parsed as any).opacity !== "number" ||
-      typeof (parsed as any).thickness !== "number" ||
-      typeof (parsed as any).length !== "number" ||
-      typeof (parsed as any).gap !== "number" ||
-      typeof (parsed as any).centerDot !== "boolean"
+      typeof cfg.enabled !== "boolean" ||
+      typeof cfg.color !== "string" ||
+      typeof cfg.opacity !== "number"
     ) {
       return null
     }
-    const cfg: CrosshairConfig = {
-      enabled: (parsed as any).enabled,
-      style,
-      color: (parsed as any).color,
-      opacity: (parsed as any).opacity,
-      thickness: (parsed as any).thickness,
-      length: (parsed as any).length,
-      gap: (parsed as any).gap,
-      centerDot: (parsed as any).centerDot
-    }
+
     return cfg
   } catch {
     return null

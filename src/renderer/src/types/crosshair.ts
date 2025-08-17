@@ -1,4 +1,4 @@
-export type CrosshairStyle = 'classic' | 'dot' | 'circle' | 'x'
+export type CrosshairStyle = "classic" | "dot" | "circle" | "x"
 
 export type CrosshairConfig = {
   enabled: boolean
@@ -8,7 +8,16 @@ export type CrosshairConfig = {
   thickness: number
   length: number
   gap: number
-  centerDot: boolean
+  centerDot?: boolean
+  centerDotSize?: number
+  centerDotOpacity?: number
+  centerDotThickness?: number
+  centerDotColor?: string
+  centerDotShape?: "circle" | "square"
+  outline?: boolean
+  outlineColor?: string
+  outlineThickness?: number
+  outlineOpacity?: number
   creator?: string
   overlayDisplayId?: number
   offsetX?: number
@@ -23,8 +32,8 @@ export type CrosshairLibraryItem = {
 }
 export const defaultConfig: CrosshairConfig = {
   enabled: true,
-  style: 'classic',
-  color: '#22C55E',
+  style: "classic",
+  color: "#22C55E",
   opacity: 1,
   thickness: 2,
   length: 5,
