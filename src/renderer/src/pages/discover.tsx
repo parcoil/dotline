@@ -33,6 +33,7 @@ function Discover() {
   const navigate = useNavigate()
   const [library, setLibrary] = useState<CrosshairLibraryItem[]>([])
   const [current, setCurrent] = useState<CrosshairConfig>(defaultConfig)
+  const [query, setQuery] = useState("")
 
   useEffect(() => {
     setLibrary(loadLibrary())
@@ -150,6 +151,19 @@ function Discover() {
       <TooltipContent side="bottom">{label}</TooltipContent>
     </Tooltip>
   )
+
+  const q = query.trim().toLowerCase()
+  const matches = (text?: string) => (text || "").toLowerCase().includes(q)
+  const filteredLibrary = q
+    ? library.filter(
+        (i) => matches(i.name) || matches(i.config.creator) || matches(String(i.config.style))
+      )
+    : library
+  const filteredPresets = q
+    ? presets.filter(
+        (p) => matches(p.name) || matches(p.config.creator) || matches(String(p.config.style))
+      )
+    : presets
   return (
     <div className="space-y-8 px-4 md:px-0 max-w-[1200px] mx-auto">
       <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -157,7 +171,14 @@ function Discover() {
           <h1 className="text-3xl font-bold tracking-tight">Discover Crosshairs</h1>
           <p className="text-muted-foreground">Manage your saved crosshairs or explore presets</p>
         </div>
-        <div className="flex flex-wrap gap-3">
+
+        <div className="flex flex-wrap gap-3 items-center">
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search library and presets..."
+            className="h-9 w-64 md:w-72 lg:w-80 rounded-md border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+          />
           <Button variant="outline" onClick={importPresetFile}>
             <Import className="w-4 h-4 mr-2" /> Import Preset
           </Button>
@@ -166,7 +187,11 @@ function Discover() {
           </Button>
         </div>
       </header>
-
+      <div className="flex gap-2 mb-2">
+        <p className="text-xs text-muted-foreground">Library: {library.length} presets</p>
+        <p className="text-xs text-muted-foreground">-</p>
+        <p className="text-xs text-muted-foreground">Presets: {presets.length} presets</p>
+      </div>
       <Tabs defaultValue="library">
         <TabsList>
           <TabsTrigger
@@ -175,6 +200,7 @@ function Discover() {
           >
             <Home className="w-4 h-4 mr-2" /> Library
           </TabsTrigger>
+
           <TabsTrigger
             value="presets"
             className="dark:data-[state=active]:bg-primary dark:data-[state=active]:text-primary-foreground"
@@ -185,14 +211,16 @@ function Discover() {
 
         <TabsContent value="library">
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
-            {library.length === 0 ? (
+            {filteredLibrary.length === 0 ? (
               <Card className="col-span-full">
                 <CardContent className="py-8 text-center text-muted-foreground">
-                  No saved crosshairs yet.
+                  {library.length === 0 && !q
+                    ? "No saved crosshairs yet."
+                    : "No matching results in your library."}
                 </CardContent>
               </Card>
             ) : (
-              library.map((item) => (
+              filteredLibrary.map((item) => (
                 <CrosshairCard
                   key={item.id}
                   name={item.name}
@@ -227,30 +255,38 @@ function Discover() {
 
         <TabsContent value="presets">
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-            {presets.map((preset) => (
-              <CrosshairCard
-                key={preset.name}
-                name={preset.name}
-                config={preset.config}
-                previewSize={140}
-                creator={preset.config.creator}
-                style={preset.config.style}
-                actions={
-                  <>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => addPresetToLibrary(preset.config, preset.name)}
-                    >
-                      Import
-                    </Button>
-                    <Button size="sm" onClick={() => applyConfig(preset.config)}>
-                      Apply
-                    </Button>
-                  </>
-                }
-              />
-            ))}
+            {filteredPresets.length === 0 ? (
+              <Card className="col-span-full">
+                <CardContent className="py-8 text-center text-muted-foreground">
+                  No matching results in presets.
+                </CardContent>
+              </Card>
+            ) : (
+              filteredPresets.map((preset) => (
+                <CrosshairCard
+                  key={preset.name}
+                  name={preset.name}
+                  config={preset.config}
+                  previewSize={140}
+                  creator={preset.config.creator}
+                  style={preset.config.style}
+                  actions={
+                    <>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => addPresetToLibrary(preset.config, preset.name)}
+                      >
+                        Import
+                      </Button>
+                      <Button size="sm" onClick={() => applyConfig(preset.config)}>
+                        Apply
+                      </Button>
+                    </>
+                  }
+                />
+              ))
+            )}
           </div>
         </TabsContent>
       </Tabs>
