@@ -9,6 +9,14 @@ import { presets } from "@/lib/presets"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Home, Paintbrush, Import, Save, Trash2, Pencil, Download } from "lucide-react"
 import { toast } from "sonner"
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from "@/components/ui/alert-dialog"
 
 const LS_KEY = "crosshairLibrary"
 
@@ -34,6 +42,8 @@ function Discover() {
   const [library, setLibrary] = useState<CrosshairLibraryItem[]>([])
   const [current, setCurrent] = useState<CrosshairConfig>(defaultConfig)
   const [query, setQuery] = useState("")
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [pendingDelete, setPendingDelete] = useState<null | { id: string; name: string }>(null)
 
   useEffect(() => {
     setLibrary(loadLibrary())
@@ -151,6 +161,17 @@ function Discover() {
       <TooltipContent side="bottom">{label}</TooltipContent>
     </Tooltip>
   )
+  const askDelete = (item: CrosshairLibraryItem) => {
+    setPendingDelete({ id: item.id, name: item.name })
+    setConfirmOpen(true)
+  }
+  const confirmDelete = () => {
+    if (pendingDelete) {
+      deleteItem(pendingDelete.id)
+      setConfirmOpen(false)
+      setPendingDelete(null)
+    }
+  }
 
   const q = query.trim().toLowerCase()
   const matches = (text?: string) => (text || "").toLowerCase().includes(q)
@@ -241,7 +262,7 @@ function Discover() {
                         </Button>
                       </TooltipButton>
                       <TooltipButton label="Delete this crosshair">
-                        <Button size="sm" variant="destructive" onClick={() => deleteItem(item.id)}>
+                        <Button size="sm" variant="destructive" onClick={() => askDelete(item)}>
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </TooltipButton>
@@ -290,6 +311,31 @@ function Discover() {
           </div>
         </TabsContent>
       </Tabs>
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogContent forceMount>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete preset?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {pendingDelete ? (
+                <>
+                  You are about to delete "{pendingDelete.name}" from your library. This action
+                  cannot be undone.
+                </>
+              ) : (
+                "This action cannot be undone."
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <Button variant="outline" onClick={() => setConfirmOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDelete}>
+              Delete
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
