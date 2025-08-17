@@ -17,6 +17,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from "@/components/ui/alert-dialog"
+import { Input } from "@/components/ui/input"
 
 const LS_KEY = "crosshairLibrary"
 
@@ -187,19 +188,13 @@ function Discover() {
     : presets
   return (
     <div className="space-y-8 px-4 md:px-0 max-w-[1200px] mx-auto">
-      <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-1">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Discover Crosshairs</h1>
           <p className="text-muted-foreground">Manage your saved crosshairs or explore presets</p>
         </div>
 
         <div className="flex flex-wrap gap-3 items-center">
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search library and presets..."
-            className="h-9 w-64 md:w-72 lg:w-80 rounded-md border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
-          />
           <Button variant="outline" onClick={importPresetFile}>
             <Import className="w-4 h-4 mr-2" /> Import Preset
           </Button>
@@ -208,11 +203,13 @@ function Discover() {
           </Button>
         </div>
       </header>
+
       <div className="flex gap-2 mb-2">
-        <p className="text-xs text-muted-foreground">Library: {library.length} presets</p>
-        <p className="text-xs text-muted-foreground">-</p>
-        <p className="text-xs text-muted-foreground">Presets: {presets.length} presets</p>
+        <p className="text-xs text-primary">Library: {library.length} presets</p>
+        <p className="text-xs text-primary">-</p>
+        <p className="text-xs text-primary">Presets: {presets.length} presets</p>
       </div>
+
       <Tabs defaultValue="library">
         <TabsList>
           <TabsTrigger
@@ -229,7 +226,13 @@ function Discover() {
             <Paintbrush className="w-4 h-4 mr-2" /> Presets
           </TabsTrigger>
         </TabsList>
-
+        <div className="flex gap-2 mb-1 mt-1">
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search library and presets..."
+          />
+        </div>
         <TabsContent value="library">
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
             {filteredLibrary.length === 0 ? (
