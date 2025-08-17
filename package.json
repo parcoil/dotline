@@ -75,7 +75,7 @@
   },
   "build": {
     "icon": "./resources/dotline",
-    "appId": "com.electron.app",
+    "appId": "com.parcoil.dotline",
     "productName": "dotline",
     "directories": {
       "buildResources": "build"

@@ -143,6 +143,21 @@ app.on("window-all-closed", () => {
   }
 })
 
+const gotLock = app.requestSingleInstanceLock()
+
+if (!gotLock) {
+  app.quit()
+} else {
+  app.on("second-instance", () => {
+    if (settingsWindow) {
+      if (settingsWindow.isMinimized()) settingsWindow.restore()
+      settingsWindow.focus()
+    }
+  })
+}
+
+// search for "frontend" in your editor to find this
+// [FRONTEND] code for frontend starts here
 ipcMain.on("window-control", (event, action: "minimize" | "maximize" | "close") => {
   const win = BrowserWindow.fromWebContents(event.sender)
   if (!win) return
