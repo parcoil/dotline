@@ -24,7 +24,7 @@
 - Rust ✅ (use Windowed fullscreen mode)
 - Minecraft ✅
 
-### Supported Oses
+### Supported OSes
 
 - Windows: ✅ (Tested on Windows 11 24H2)
 - Linux: ✅ (Tested on Arch Linux on KDE)
@@ -38,7 +38,9 @@
 
 #### ⚠️ if the crosshair disapears in game try setting the game to windowed fullscreen mode.
 
-### 🎯 Adding Preset crosshairs
+### 🎯 Adding Preset Crosshairs
+
+#### ⚠️ if you are adding a preset crosshair, be sure to have your github username to the creator field
 
 Preset crosshairs are located in `src/renderer/src/lib/presets.ts`.
 

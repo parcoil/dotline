@@ -5,6 +5,7 @@ import { defaultConfig } from "@/types/crosshair"
 // if u do add your own preset be sure to have your github username to the creator field
 // more customization features are coming soon
 // a better way of adding ur own will be coming soon
+// take a look at the editor inside of dotline or take a look at `/src/types/crosshair.ts` for more info
 
 export const presets: { name: string; config: CrosshairConfig }[] = [
   {
