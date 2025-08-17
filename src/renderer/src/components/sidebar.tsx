@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { Home, Settings, Menu, Pencil, Move3D } from "lucide-react"
 import Discord from "./discord"
+import Github from "./github"
 
 function Sidebar() {
   const [collapsed, setCollapsed] = useState(true)
@@ -30,7 +31,9 @@ function Sidebar() {
   const linkClasses = ({ isActive }) =>
     cn(
       "group relative flex items-center rounded-md px-2.5 py-2 text-sm transition-all active:scale-95 gap-2",
-      isActive ? "bg-primary text-primary-foreground" : "hover:bg-accent hover:text-accent-foreground"
+      isActive
+        ? "bg-primary text-primary-foreground"
+        : "hover:bg-accent hover:text-accent-foreground"
     )
 
   const Label = ({ children }) => (
@@ -43,7 +46,7 @@ function Sidebar() {
       {children}
     </span>
   )
-// use custom tooltip and not shadcn to fit the sidebar style
+  // use custom tooltip and not shadcn to fit the sidebar style
   const Tooltip = ({ text }) =>
     collapsed ? (
       <span
@@ -65,14 +68,23 @@ function Sidebar() {
       )}
     >
       <div className={cn("flex items-center justify-between p-2", collapsed && "border-b")}>
-        <Button variant="ghost" onClick={() => setCollapsed(!collapsed)} aria-label="Toggle sidebar">
+        <Button
+          variant="ghost"
+          onClick={() => setCollapsed(!collapsed)}
+          aria-label="Toggle sidebar"
+        >
           <Menu size={18} />
         </Button>
       </div>
 
       <nav className="flex flex-col gap-1 p-2">
         {navItems.map(({ to, label, icon }) => (
-          <NavLink key={to} to={to} className={linkClasses} aria-label={collapsed ? label : undefined}>
+          <NavLink
+            key={to}
+            to={to}
+            className={linkClasses}
+            aria-label={collapsed ? label : undefined}
+          >
             <span className="flex items-center justify-center w-5 h-5">{icon}</span>
             <Label>{label}</Label>
             <Tooltip text={label} />
@@ -82,7 +94,12 @@ function Sidebar() {
 
       <nav className="flex flex-col gap-1 p-2 mt-auto border-t">
         {footerItems.map(({ to, label, icon }) => (
-          <NavLink key={to} to={to} className={linkClasses} aria-label={collapsed ? label : undefined}>
+          <NavLink
+            key={to}
+            to={to}
+            className={linkClasses}
+            aria-label={collapsed ? label : undefined}
+          >
             <span className="flex items-center justify-center w-5 h-5">{icon}</span>
             <Label>{label}</Label>
             <Tooltip text={label} />
@@ -103,6 +120,21 @@ function Sidebar() {
           </span>
           <Label>Discord</Label>
           <Tooltip text="Discord" />
+        </a>
+        <a
+          href="https://github.com/Parcoil/dotline"
+          target="_blank"
+          className={cn(
+            "group relative flex items-center rounded-md px-2.5 py-2 text-sm transition-all active:scale-95 gap-2",
+            "hover:bg-accent hover:text-accent-foreground"
+          )}
+          aria-label={collapsed ? "Discord" : undefined}
+        >
+          <span className="flex items-center justify-center">
+            <Github className="w-5 h-5 fill-secondary-foreground" />
+          </span>
+          <Label>Github</Label>
+          <Tooltip text="Github" />
         </a>
       </nav>
     </aside>
