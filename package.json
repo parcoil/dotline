@@ -1,7 +1,7 @@
 {
   "name": "dotline",
   "version": "0.1.0",
-  "description": "a modern crosshair overlay.",
+  "description": "A modern crosshair overlay.",
   "main": "./out/main/index.js",
   "author": "Parcoil",
   "homepage": "https://parcoil.com",

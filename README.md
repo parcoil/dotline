@@ -3,7 +3,7 @@
 
 <h1>Dotline</h1>
 
-<p>a modern crosshair overlay</p>
+<p>A modern crosshair overlay</p>
 
 </div>
 
@@ -11,16 +11,32 @@
 
 ## ✨ Features
 
-- 🎯 Customizble Crosshairs
+- 🎯 Customizable Crosshairs
 - 🖌 10+ Presets
 - 📂 Import & Export your configs
 - 🐧 Cross-Platform
+
+### Tested Games
+
+#### All games where tested on Windows 11 24H2
+
+- CS2 ✅
+- Rust ✅ (use Windowed fullscreen mode)
+- Minecraft ✅
 
 ### Supported Oses
 
 - Windows: ✅ (Tested on Windows 11 24H2)
 - Linux: ✅ (Tested on Arch Linux on KDE)
 - MacOS ⚠️ (Seems to work. must build yourself, tested on MacOS sequoia)
+
+## ⚠️ Known Issues
+
+- MacOS requires manual build, may not work on all versions.
+- Linux window overlays may behave differently on Wayland vs X11.
+- Does not work on Hyprland. may not work on other window managers
+
+#### ⚠️ if the crosshair disapears in game try setting the game to windowed fullscreen mode.
 
 ### 🎯 Adding Preset crosshairs
 
