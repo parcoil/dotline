@@ -14,6 +14,10 @@ export type CrosshairConfig = {
   centerDotThickness?: number
   centerDotColor?: string
   centerDotShape?: "circle" | "square"
+  centerDotOutline?: boolean
+  centerDotOutlineColor?: string
+  centerDotOutlineThickness?: number
+  centerDotOutlineOpacity?: number
   outline?: boolean
   outlineColor?: string
   outlineThickness?: number

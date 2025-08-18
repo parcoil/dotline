@@ -80,6 +80,14 @@ export function Crosshair({
     )
     const dotSize = config.centerDotSize ?? Math.max(1, config.thickness / 2)
 
+    const centerDotOutlineEnabled = !!config.centerDotOutline
+    const centerDotStroke = centerDotOutlineEnabled
+      ? hexToRgba(config.centerDotOutlineColor ?? "#000000", config.centerDotOutlineOpacity ?? 1)
+      : undefined
+    const centerDotStrokeWidth = centerDotOutlineEnabled
+      ? (config.centerDotOutlineThickness ?? 1)
+      : undefined
+
     return config.centerDotShape === "square" ? (
       <rect
         x={center - dotSize / 2}
@@ -87,8 +95,8 @@ export function Crosshair({
         width={dotSize}
         height={dotSize}
         fill={dotColor}
-        stroke={outlineWithOpacity}
-        strokeWidth={config.outlineThickness ?? 1}
+        stroke={centerDotStroke}
+        strokeWidth={centerDotStrokeWidth}
       />
     ) : (
       <circle
@@ -96,8 +104,8 @@ export function Crosshair({
         cy={center}
         r={dotSize}
         fill={dotColor}
-        stroke={outlineWithOpacity}
-        strokeWidth={config.outlineThickness ?? 1}
+        stroke={centerDotStroke}
+        strokeWidth={centerDotStrokeWidth}
       />
     )
   }

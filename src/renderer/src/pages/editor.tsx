@@ -404,6 +404,71 @@ function Editor() {
                   </SelectContent>
                 </Select>
               </div>
+
+              <div className="flex items-center justify-between">
+                <Label>Center Dot Outline</Label>
+                <Switch
+                  checked={!!config.centerDotOutline}
+                  onCheckedChange={(checked) =>
+                    setConfig((c) => {
+                      const next = { ...c, centerDotOutline: !!checked }
+                      if (checked) {
+                        if (!next.centerDotOutlineColor) next.centerDotOutlineColor = "#000000"
+                        if (next.centerDotOutlineThickness == null)
+                          next.centerDotOutlineThickness = 1
+                        if (next.centerDotOutlineOpacity == null) next.centerDotOutlineOpacity = 1
+                      }
+                      return next
+                    })
+                  }
+                />
+              </div>
+
+              {config.centerDotOutline && (
+                <>
+                  <div>
+                    <Label>Center Dot Outline Color</Label>
+                    <Input
+                      type="color"
+                      value={config.centerDotOutlineColor ?? "#000000"}
+                      onChange={(e) => handleChange("centerDotOutlineColor", e.target.value)}
+                      className="w-20 h-10 p-0 border-none cursor-pointer mt-1"
+                    />
+                  </div>
+
+                  <div className="gap-3 flex flex-col">
+                    <div className="flex justify-between">
+                      <Label>Center Dot Outline Thickness</Label>
+                      <span className="text-sm text-muted-foreground">
+                        {config.centerDotOutlineThickness ?? 1}
+                      </span>
+                    </div>
+                    <Slider
+                      value={[config.centerDotOutlineThickness ?? 1]}
+                      onValueChange={(val) => handleChange("centerDotOutlineThickness", val[0])}
+                      min={1}
+                      max={10}
+                      step={1}
+                    />
+                  </div>
+
+                  <div className="gap-3 flex flex-col">
+                    <div className="flex justify-between">
+                      <Label>Center Dot Outline Opacity</Label>
+                      <span className="text-sm text-muted-foreground">
+                        {(config.centerDotOutlineOpacity ?? 1).toFixed(2)}
+                      </span>
+                    </div>
+                    <Slider
+                      value={[config.centerDotOutlineOpacity ?? 1]}
+                      onValueChange={(val) => handleChange("centerDotOutlineOpacity", val[0])}
+                      min={0}
+                      max={1}
+                      step={0.01}
+                    />
+                  </div>
+                </>
+              )}
             </>
           )}
         </CardContent>
