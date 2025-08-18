@@ -12,6 +12,7 @@
 ## ✨ Features
 
 - 🎯 Customizable Crosshairs
+- ✏️ Crosshair Editor
 - 🖌 10+ Presets
 - 📂 Import & Export your configs
 - 🐧 Cross-Platform
@@ -28,6 +29,8 @@
 
 - Windows: ✅ (Tested on Windows 11 24H2)
 - Linux: ✅ (Tested on Arch Linux on KDE)
+- Marvel Rivals ✅
+- The Finals ✅
 - MacOS ⚠️ (Seems to work. must build yourself, tested on MacOS sequoia)
 
 ## ⚠️ Known Issues
@@ -39,8 +42,6 @@
 #### ⚠️ if the crosshair disapears in game try setting the game to windowed fullscreen mode.
 
 ### 🎯 Adding Preset Crosshairs
-
-#### ⚠️ if you are adding a preset crosshair, be sure to have your github username to the creator field
 
 Preset crosshairs are located in `src/renderer/src/lib/presets.ts`.
 
