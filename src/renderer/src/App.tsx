@@ -17,6 +17,14 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog"
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { Toaster } from "@/components/ui/sonner"
 import { toast } from "sonner"
@@ -56,6 +64,17 @@ function RoutedApp() {
   const [isDownloading, setIsDownloading] = useState(false)
   const [downloadPercent, setDownloadPercent] = useState<number>(0)
   const isDownloaded = useMemo(() => downloadPercent >= 100, [downloadPercent])
+  const [onboardingOpen, setOnboardingOpen] = useState(false)
+
+  useEffect(() => {
+    const seen = localStorage.getItem("onboardingSeen")
+    if (!seen) setOnboardingOpen(true)
+  }, [])
+
+  const handleDismissOnboarding = () => {
+    localStorage.setItem("onboardingSeen", "true")
+    setOnboardingOpen(false)
+  }
 
   useEffect(() => {
     const onAvailable = (_e: unknown, payload: { version?: string }) => {
@@ -146,6 +165,30 @@ function RoutedApp() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <AlertDialog open={onboardingOpen} onOpenChange={setOnboardingOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Welcome to Dotline</AlertDialogTitle>
+            <AlertDialogDescription>
+              The app is in alpha. Please report bugs and request features on our GitHub repository.
+              you can also report a issue in settings
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            {/* <Button
+              variant="outline"
+              onClick={() => {
+                try {
+                  window.open("https://github.com/Parcoil/dotline/issues/new/choose", "_blank")
+                } catch {}
+              }}
+            >
+              Report / Request
+            </Button> */}
+            <Button onClick={handleDismissOnboarding}>Got it</Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <Toaster richColors closeButton />
     </div>
   )
