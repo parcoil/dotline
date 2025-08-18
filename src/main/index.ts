@@ -11,6 +11,7 @@ import { CrosshairConfig, CrosshairStyle, defaultConfig } from "@/types/crosshai
 
 let settingsWindow: BrowserWindow | null = null
 let overlayWindow: BrowserWindow | null = null
+let currentOverlayDisplayId: number | null = null
 
 function createSettingsWindow(): void {
   settingsWindow = new BrowserWindow({
@@ -51,6 +52,7 @@ function createSettingsWindow(): void {
 function createOverlayWindow(): void {
   const primaryDisplay = screen.getPrimaryDisplay()
   const { x, y, width, height } = primaryDisplay.bounds
+  currentOverlayDisplayId = primaryDisplay.id
 
   overlayWindow = new BrowserWindow({
     width,
@@ -76,7 +78,14 @@ function createOverlayWindow(): void {
   overlayWindow.setAlwaysOnTop(true, "screen-saver")
   overlayWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
 
-  overlayWindow.on("ready-to-show", () => {
+  overlayWindow.webContents.on("did-finish-load", () => {
+    try {
+      const target = currentOverlayDisplayId
+        ? screen.getAllDisplays().find((d) => d.id === currentOverlayDisplayId)
+        : screen.getPrimaryDisplay()
+      const b = target?.bounds ?? { x, y, width, height }
+      overlayWindow?.setBounds({ x: b.x, y: b.y, width: b.width, height: b.height })
+    } catch {}
     overlayWindow?.setIgnoreMouseEvents(true, { forward: true })
     overlayWindow?.showInactive()
   })
@@ -93,6 +102,16 @@ function createOverlayWindow(): void {
       query: { overlay: "1" }
     })
   }
+
+  screen.on("display-metrics-changed", () => {
+    if (!overlayWindow) return
+    const target = currentOverlayDisplayId
+      ? screen.getAllDisplays().find((d) => d.id === currentOverlayDisplayId)
+      : screen.getPrimaryDisplay()
+    if (!target) return
+    const { x: dx, y: dy, width: dw, height: dh } = target.bounds
+    overlayWindow.setBounds({ x: dx, y: dy, width: dw, height: dh })
+  })
 }
 
 // This method will be called when Electron has finished
@@ -220,6 +239,7 @@ ipcMain.handle("overlay:set-display", (_event, displayId: number) => {
   overlayWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
   overlayWindow.setIgnoreMouseEvents(true, { forward: true })
   overlayWindow.showInactive()
+  currentOverlayDisplayId = target.id
   return true
 })
 
