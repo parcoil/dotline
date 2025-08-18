@@ -72,6 +72,37 @@ function Settings() {
           </Button>
         </CardContent>
       </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Support</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between">
+            <Label>Report a issue or Request a feature </Label>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  try {
+                    window.open("https://discord.com/invite/En5YJYWj3Z", "_blank")
+                  } catch {}
+                }}
+              >
+                Support (on Discord)
+              </Button>
+              <Button
+                onClick={() => {
+                  try {
+                    window.open("https://github.com/Parcoil/dotline/issues/new/choose", "_blank")
+                  } catch {}
+                }}
+              >
+                Report / Request (on GitHub)
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* <Card>
         <CardHeader>
