@@ -278,7 +278,17 @@ function Editor() {
             <Label>Outline</Label>
             <Switch
               checked={config.outline ?? false}
-              onCheckedChange={(checked) => handleChange("outline", !!checked)}
+              onCheckedChange={(checked) =>
+                setConfig((c) => {
+                  const next = { ...c, outline: !!checked }
+                  if (checked) {
+                    if (!next.outlineColor) next.outlineColor = "#000000"
+                    if (next.outlineThickness == null) next.outlineThickness = 1
+                    if (next.outlineOpacity == null) next.outlineOpacity = 1
+                  }
+                  return next
+                })
+              }
             />
           </div>
 
