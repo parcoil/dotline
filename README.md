@@ -2,7 +2,7 @@
 <img src="./resources/dotline.png" width="100" height="100" />
 
 <h1>Dotline</h1>
-
+ <img alt="GitHub Downloads (all assets, latest release)" src="https://img.shields.io/github/downloads/parcoil/dotline/latest/total?style=for-the-badge&label=Total%20Downloads&labelColor=0A0A0A&color=22c55e">
 <p>A modern crosshair overlay</p>
 
 </div>
