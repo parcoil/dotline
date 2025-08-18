@@ -23,15 +23,18 @@
 
 - CS2 ✅
 - Rust ✅ (use Windowed fullscreen mode)
+- Marvel Rivals ✅
+- The Finals ✅
 - Minecraft ✅
 
 ### Supported OSes
 
 - Windows: ✅ (Tested on Windows 11 24H2)
 - Linux: ✅ (Tested on Arch Linux on KDE)
-- Marvel Rivals ✅
-- The Finals ✅
 - MacOS ⚠️ (Seems to work. must build yourself, tested on MacOS sequoia)
+
+> [!WARNING]  
+> Dotline is in alpha, expect bugs, issues, missing features and frequent updates. feel free to open an issue if you find any. and please star the repo if you like it.
 
 ## ⚠️ Known Issues
 
@@ -63,6 +66,12 @@ Example:
 ```
 
 ## 🛠️ Building Dotline
+
+### Prerequisites
+
+- Node.js v22
+- pnpm
+- a 64-bit version of Windows, Linux or MacOS
 
 ### Install
 
