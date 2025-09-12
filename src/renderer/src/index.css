@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -42,7 +42,7 @@
   --sidebar-accent-foreground: oklch(0.4479 0.1083 151.3277);
   --sidebar-border: oklch(0.9197 0.004 286.3202);
   --sidebar-ring: oklch(0.6271 0.1699 149.2138);
-  --font-sans: Inter, sans-serif;
+  --font-sans: Poppins, sans-serif;
   --font-serif: serif;
   --font-mono: Roboto Mono, monospace;
   --radius: 0.55rem;
@@ -91,7 +91,7 @@
   --sidebar-accent-foreground: oklch(0.8003 0.1821 151.711);
   --sidebar-border: oklch(0.2739 0.0055 286.0326);
   --sidebar-ring: oklch(0.7227 0.192 149.5793);
-  --font-sans: Inter, sans-serif;
+  --font-sans: Poppins, sans-serif;
   --font-serif: serif;
   --font-mono: Roboto Mono, monospace;
   --radius: 0.55rem;
