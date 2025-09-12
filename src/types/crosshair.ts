@@ -1,4 +1,4 @@
-export type CrosshairStyle = "classic" | "dot" | "circle" | "x"
+export type CrosshairStyle = "classic" | "dot" | "circle" | "x" | "image"
 
 export type CrosshairConfig = {
   enabled: boolean
@@ -26,6 +26,8 @@ export type CrosshairConfig = {
   overlayDisplayId?: number
   offsetX?: number
   offsetY?: number
+  imageUrl?: string
+  imageSize?: number
 }
 
 export type CrosshairLibraryItem = {
@@ -42,5 +44,7 @@ export const defaultConfig: CrosshairConfig = {
   thickness: 2,
   length: 5,
   gap: 0,
-  centerDot: false
+  centerDot: false,
+  imageUrl: "",
+  imageSize: 32
 }

@@ -197,6 +197,7 @@ function Editor() {
                 <SelectItem value="dot">Dot</SelectItem>
                 <SelectItem value="circle">Circle</SelectItem>
                 <SelectItem value="x">X</SelectItem>
+                <SelectItem value="image">Image</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -213,6 +214,66 @@ function Editor() {
           </div>
         </CardContent>
       </Card>
+
+      {config.style === "image" && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Image Settings</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="image-url">Image URL</Label>
+              <div className="flex gap-2 mt-1">
+                <Input
+                  id="image-url"
+                  type="text"
+                  value={config.imageUrl ?? ""}
+                  onChange={(e) => handleChange("imageUrl", e.target.value)}
+                  placeholder="Enter image URL or upload"
+                  className="flex-1"
+                />
+                <input
+                  type="file"
+                  id="image-upload"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = (event) => {
+                        const base64 = event.target?.result as string;
+                        handleChange("imageUrl", base64);
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => document.getElementById("image-upload")?.click()}
+                >
+                  Upload
+                </Button>
+              </div>
+            </div>
+            <div className="gap-3 flex flex-col">
+              <div className="flex justify-between">
+                <Label>Image Size</Label>
+                <span className="text-sm text-muted-foreground">{config.imageSize ?? 32}</span>
+              </div>
+              <Slider
+                value={[config.imageSize ?? 32]}
+                onValueChange={(val) => handleChange("imageSize", val[0])}
+                min={8}
+                max={128}
+                step={1}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>

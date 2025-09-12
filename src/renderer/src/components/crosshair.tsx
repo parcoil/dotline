@@ -210,6 +210,17 @@ export function Crosshair({
           </>
         )}
 
+        {config.style === "image" && config.imageUrl && (
+          <image
+            href={config.imageUrl}
+            x={center - (config.imageSize ?? 32) / 2}
+            y={center - (config.imageSize ?? 32) / 2}
+            width={config.imageSize ?? 32}
+            height={config.imageSize ?? 32}
+            opacity={config.opacity}
+          />
+        )}
+
         {renderCenterDot()}
       </svg>
     </div>

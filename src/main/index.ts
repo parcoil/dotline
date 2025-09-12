@@ -290,9 +290,8 @@ ipcMain.handle("config:import", async () => {
 
     if (!parsed || typeof parsed !== "object") return null
 
-    const allowedStyles: CrosshairStyle[] = ["classic", "dot", "circle", "x"]
+    const allowedStyles: CrosshairStyle[] = ["classic", "dot", "circle", "x", "image"]
 
-    // merge with defaultConfig, fallback to defaults for missing fields
     const cfg: CrosshairConfig = {
       ...defaultConfig,
       ...parsed,
