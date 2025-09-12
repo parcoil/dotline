@@ -146,7 +146,7 @@ function Editor() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-4">
+    <div className="max-w-7xl mx-auto space-y-4">
       <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Editor</h1>
@@ -166,21 +166,53 @@ function Editor() {
           </Button>
         </div>
       </header>
-      <Card>
-        <CardHeader>
-          <CardTitle>Preview</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-center">
-            <div
-              className="rounded-md border bg-background relative flex items-center justify-center"
-              style={{ width: 240, height: 240 }}
-            >
-              <Crosshair mode="embed" config={scaleConfigForPreview(config, 220)} />
-            </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-5 lg:sticky lg:top-4 lg:self-start">
+          <Card className="h-full">
+            <CardHeader>
+              <CardTitle>Preview</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-center">
+                <div
+                  className="rounded-md border bg-white relative flex items-center justify-center"
+                  style={{ width: 320, height: 320 }}
+                >
+                  <Crosshair mode="embed" config={scaleConfigForPreview(config, 300)} />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <div className="mt-4 flex gap-2 justify-center items-center">
+            <Button onClick={handleImport} variant="outline" size="sm">
+              Import
+            </Button>
+            <Button onClick={handleExport} variant="outline" size="sm">
+              Export
+            </Button>
+            <Button onClick={save} size="sm">
+              Apply to Current
+            </Button>
           </div>
-        </CardContent>
-      </Card>
+          
+          <Card className="mt-4">
+            <CardHeader>
+              <CardTitle>Save to Library</CardTitle>
+            </CardHeader>
+            <CardContent className="flex items-center gap-2">
+              <Input
+                placeholder="Give your crosshair a name"
+                value={saveName}
+                onChange={(e) => setSaveName(e.target.value)}
+              />
+              <Button onClick={saveToLibrary}>{editingExisting ? "Save as New" : "Save"}</Button>
+            </CardContent>
+          </Card>
+        </div>
+        
+        <div className="lg:col-span-7 space-y-4 overflow-y-auto max-h-screen pr-2">
       <Card>
         <CardHeader>
           <CardTitle>General</CardTitle>
@@ -535,31 +567,8 @@ function Editor() {
         </CardContent>
       </Card>
 
-      <div className="flex  gap-2 justify-center items-center">
-        <Button onClick={handleImport} variant="outline" size="sm">
-          Import
-        </Button>
-        <Button onClick={handleExport} variant="outline" size="sm">
-          Export
-        </Button>
-        <Button onClick={save} size="sm">
-          Apply to Current
-        </Button>
+        </div>
       </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Save to Library</CardTitle>
-        </CardHeader>
-        <CardContent className="flex items-center gap-2">
-          <Input
-            placeholder="Give your crosshair a name"
-            value={saveName}
-            onChange={(e) => setSaveName(e.target.value)}
-          />
-          <Button onClick={saveToLibrary}>{editingExisting ? "Save as New" : "Save"}</Button>
-        </CardContent>
-      </Card>
     </div>
   )
 }
