@@ -29,6 +29,7 @@ import { Button } from "@/components/ui/button"
 import { Toaster } from "@/components/ui/sonner"
 import { toast } from "sonner"
 import { OverlayProvider } from "@/hooks/overlay"
+import { CrosshairConfigProvider } from "@/hooks/crosshair-config"
 
 function Overlay() {
   const [config, setConfig] = useState<CrosshairConfig>(defaultConfig)
@@ -211,7 +212,9 @@ function App() {
     <Overlay />
   ) : (
     <OverlayProvider>
-      <RoutedApp />
+      <CrosshairConfigProvider>
+        <RoutedApp />
+      </CrosshairConfigProvider>
     </OverlayProvider>
   )
 }

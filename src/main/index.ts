@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain, screen, dialog } from "electron"
+import { app, shell, BrowserWindow, ipcMain, screen, dialog, globalShortcut } from "electron"
 import type { SaveDialogOptions, OpenDialogOptions } from "electron"
 import { join } from "path"
 import { electronApp, optimizer, is } from "@electron-toolkit/utils"
@@ -131,6 +131,12 @@ app.whenReady().then(() => {
   createSettingsWindow()
   createOverlayWindow()
 
+  // Register global shortcut to toggle crosshair
+  globalShortcut.register("CommandOrControl+Shift+X", () => {
+    console.log("Pressed")
+    settingsWindow?.webContents.send("toggle-crosshair")
+  })
+
   // Initialize auto updater and perform a background check
   initAutoUpdater(() => settingsWindow)
   // Delay a little to avoid stealing focus on cold start
@@ -157,6 +163,7 @@ app.whenReady().then(() => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on("window-all-closed", () => {
+  globalShortcut.unregisterAll()
   if (process.platform !== "darwin") {
     app.quit()
   }
@@ -172,6 +179,10 @@ if (!gotLock) {
       if (settingsWindow.isMinimized()) settingsWindow.restore()
       settingsWindow.focus()
     }
+  })
+
+  app.on("before-quit", () => {
+    globalShortcut.unregisterAll()
   })
 }
 
