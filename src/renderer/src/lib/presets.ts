@@ -184,5 +184,31 @@ export const presets: { name: string; config: CrosshairConfig }[] = [
   {
     name: "Neon Pink Dot",
     config: { ...defaultConfig, style: "dot", color: "#ff2ec4", thickness: 3, creator: "Parcoil" }
+  },
+  {
+    name: "Tiny Hollow Cross Green",
+    config: {
+      ...defaultConfig,
+      style: "classic",
+      color: "#00ff00",
+      thickness: 2,
+      length: 3,
+      gap: 1,
+      opacity: 1,
+      creator: "FuelClock"
+    }
+  },
+  {
+    name: "Tiny Hollow Cross Pink",
+    config: {
+      ...defaultConfig,
+      style: "classic",
+      color: "#c800ff",
+      thickness: 2,
+      length: 3,
+      gap: 1,
+      opacity: 1,
+      creator: "FuelClock"
+    }
   }
 ]
