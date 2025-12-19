@@ -1,4 +1,4 @@
-import { useMemo } from "react"
+import { useMemo, useState, useEffect, useRef } from "react"
 import type { CrosshairConfig } from "../../../types/crosshair"
 
 export function Crosshair({
@@ -41,6 +41,48 @@ export function Crosshair({
     )
   }
 
+  const [pressed, setPressed] = useState(false)
+  const waitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    if (!config.onPress || mode === "embed") return
+
+    const handler = (_: any, payload: { pressed: boolean }) => {
+      if (payload?.pressed) {
+        // On press: clear pending hide timer and show immediately
+        if (waitTimerRef.current) {
+          clearTimeout(waitTimerRef.current as any)
+          waitTimerRef.current = null
+        }
+        setPressed(true)
+      } else {
+        // On release: start hide timer (if configured)
+        const delay = config.waitTime ?? 0
+        if (delay > 0) {
+          if (waitTimerRef.current) clearTimeout(waitTimerRef.current as any)
+          const timer = setTimeout(() => {
+            waitTimerRef.current = null
+            setPressed(false)
+          }, delay)
+          waitTimerRef.current = timer
+        } else {
+          setPressed(false)
+        }
+      }
+    }
+
+    try {
+      window.electron.ipcRenderer.on("overlay:mouse", handler as any)
+    } catch {}
+
+    return () => {
+      try {
+        if (waitTimerRef.current) clearTimeout(waitTimerRef.current as any)
+        window.electron.ipcRenderer.removeListener("overlay:mouse", handler as any)
+      } catch {}
+    }
+  }, [config.onPress, config.waitTime, mode])
+
   const style = useMemo(() => {
     const isEmbed = mode === "embed"
     const left = config.offsetX ?? 0
@@ -64,7 +106,8 @@ export function Crosshair({
         }
   }, [mode, config.offsetX, config.offsetY])
 
-  if (!config.enabled) return null
+  const visible = mode === "embed" ? config.enabled : config.enabled && (!config.onPress || pressed)
+  if (!visible) return null
 
   const colorWithOpacity = hexToRgba(config.color, config.opacity)
 

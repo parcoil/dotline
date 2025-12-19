@@ -9,6 +9,9 @@ import { promises as fs } from "fs"
 import { initAutoUpdater, triggerAutoUpdateCheck } from "./updater"
 import { CrosshairConfig, CrosshairStyle, defaultConfig } from "@/types/crosshair"
 
+let uiohook: any = null
+let uiohookLoaded = false
+
 let settingsWindow: BrowserWindow | null = null
 let overlayWindow: BrowserWindow | null = null
 let currentOverlayDisplayId: number | null = null
@@ -131,6 +134,48 @@ app.whenReady().then(() => {
   createSettingsWindow()
   createOverlayWindow()
 
+  ;(async () => {
+    try {
+      const mod = await import("uiohook-napi")
+      // The actual hook instance is in mod.default.uIOhook or mod.uIOhook
+      uiohook = mod.default?.uIOhook || mod.uIOhook
+
+      if (uiohook) {
+        console.log("uiohook instance type:", uiohook.constructor.name)
+        console.log("uiohook own properties:", Object.getOwnPropertyNames(uiohook))
+        console.log("uiohook.on type:", typeof uiohook.on)
+        console.log("uiohook.start type:", typeof uiohook.start)
+
+        if (typeof uiohook.on === "function") {
+          uiohook.on("mousedown", () => {
+            overlayWindow?.webContents.send("overlay:mouse", { pressed: true })
+          })
+
+          uiohook.on("mouseup", () => {
+            overlayWindow?.webContents.send("overlay:mouse", { pressed: false })
+          })
+        }
+
+        // Try different ways to start
+        if (typeof uiohook.start === "function") {
+          uiohook.start()
+          uiohookLoaded = true
+          console.log("uiohook-napi started with .start()")
+        } else if (typeof uiohook.run === "function") {
+          uiohook.run()
+          uiohookLoaded = true
+          console.log("uiohook-napi started with .run()")
+        } else {
+          console.warn("Could not find start/run method on uiohook")
+        }
+      } else {
+        console.warn("uiohook instance not found")
+      }
+    } catch (e) {
+      console.warn("uiohook-napi not available:", e)
+    }
+  })()
+
   // Initialize auto updater and perform a background check
   initAutoUpdater(() => settingsWindow)
   // Delay a little to avoid stealing focus on cold start
@@ -160,6 +205,12 @@ app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit()
   }
+})
+
+app.on("will-quit", () => {
+  try {
+    if (uiohook && uiohookLoaded) uiohook.stop()
+  } catch {}
 })
 
 const gotLock = app.requestSingleInstanceLock()

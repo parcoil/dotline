@@ -28,6 +28,8 @@ export type CrosshairConfig = {
   offsetY?: number
   imageUrl?: string
   imageSize?: number
+  onPress?: boolean
+  waitTime?: number
 }
 
 export type CrosshairLibraryItem = {
@@ -46,5 +48,7 @@ export const defaultConfig: CrosshairConfig = {
   gap: 0,
   centerDot: false,
   imageUrl: "",
-  imageSize: 32
+  imageSize: 32,
+  onPress: false,
+  waitTime: 0
 }

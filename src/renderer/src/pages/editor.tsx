@@ -166,7 +166,7 @@ function Editor() {
           </Button>
         </div>
       </header>
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div className="lg:col-span-5 lg:sticky lg:top-4 lg:self-start">
           <Card className="h-full">
@@ -184,7 +184,7 @@ function Editor() {
               </div>
             </CardContent>
           </Card>
-          
+
           <div className="mt-4 flex gap-2 justify-center items-center">
             <Button onClick={handleImport} variant="outline" size="sm">
               Import
@@ -196,7 +196,7 @@ function Editor() {
               Apply to Current
             </Button>
           </div>
-          
+
           <Card className="mt-4">
             <CardHeader>
               <CardTitle>Save to Library</CardTitle>
@@ -211,7 +211,7 @@ function Editor() {
             </CardContent>
           </Card>
         </div>
-        
+
         <div className="lg:col-span-7 space-y-4 overflow-y-auto max-h-screen pr-2">
       <Card>
         <CardHeader>
@@ -244,6 +244,30 @@ function Editor() {
               className="w-20 h-10 p-0 border-none cursor-pointer mt-1"
             />
           </div>
+
+          <div className="flex items-center justify-between">
+            <Label>Only On Click</Label>
+            <Switch
+              checked={config.onPress ?? false}
+              onCheckedChange={(checked) => handleChange("onPress", !!checked)}
+            />
+          </div>
+
+          {config.onPress && (
+            <div className="gap-3 flex flex-col">
+              <div className="flex justify-between">
+                <Label>Wait Time After Release (ms)</Label>
+                <span className="text-sm text-muted-foreground">{config.waitTime ?? 0}</span>
+              </div>
+              <Slider
+                value={[config.waitTime ?? 0]}
+                onValueChange={(val) => handleChange("waitTime", val[0])}
+                min={0}
+                max={3000}
+                step={50}
+              />
+            </div>
+          )}
         </CardContent>
       </Card>
 
