@@ -19,6 +19,25 @@ import { Crosshair } from "@/components/crosshair"
 import { useLocation } from "react-router"
 import { toast } from "sonner"
 
+const KEY_CODE_NAMES: Record<number, string> = {
+  59: "F1", 60: "F2", 61: "F3", 62: "F4", 63: "F5", 64: "F6", 65: "F7", 66: "F8", 67: "F9", 68: "F10", 87: "F11", 88: "F12",
+  2: "1", 3: "2", 4: "3", 5: "4", 6: "5", 7: "6", 8: "7", 9: "8", 10: "9", 11: "0",
+  16: "Q", 17: "W", 18: "E", 19: "R", 20: "T", 21: "Y", 22: "U", 23: "I", 24: "O", 25: "P",
+  30: "A", 31: "S", 32: "D", 33: "F", 34: "G", 35: "H", 36: "J", 37: "K", 38: "L",
+  44: "Z", 45: "X", 46: "C", 47: "V", 48: "B", 49: "N", 50: "M",
+  1: "Escape", 15: "Tab", 28: "Enter", 29: "LeftCtrl", 42: "LeftShift", 54: "RightShift", 56: "LeftAlt", 57: "Space", 58: "CapsLock",
+  69: "NumLock", 70: "ScrollLock", 55: "Numpad*", 74: "Numpad-", 78: "Numpad+", 83: "NumpadPeriod",
+  71: "Numpad7", 72: "Numpad8", 73: "Numpad9", 75: "Numpad4", 76: "Numpad5", 77: "Numpad6", 79: "Numpad1", 80: "Numpad2", 81: "Numpad3", 82: "Numpad0",
+  98: "Up", 104: "PageUp", 99: "Right", 105: "PageDown", 100: "Left", 103: "End", 102: "Home", 101: "Down",
+  110: "Insert", 111: "Delete",
+  257: "Mouse1", 258: "Mouse2", 259: "Mouse3"
+}
+
+function getKeyName(keyCode: number | null): string {
+  if (keyCode === null) return "Not set"
+  return KEY_CODE_NAMES[keyCode] || `Key ${keyCode}`
+}
+
 function Editor() {
   const location = useLocation()
   type EditorNavState = { initialConfig?: CrosshairConfig; itemId?: string; itemName?: string }
@@ -28,7 +47,31 @@ function Editor() {
   const editingItemName = state.itemName
   const editingExisting = !!editingItemId
   const [config, setConfig] = useState<CrosshairConfig>(navInitial ?? defaultConfig)
+  const [bindingKeybind, setBindingKeybind] = useState(false)
   const [saveName, setSaveName] = useState<string>("")
+
+  useEffect(() => {
+    const handleKeybindCaptured = (_: any, data: { keyCode: number }) => {
+      const updated: CrosshairConfig = { ...config, toggleKeybind: data.keyCode }
+      setConfig(updated)
+      try {
+        localStorage.setItem("currentConfig", JSON.stringify(updated))
+        void window.electron.ipcRenderer.invoke("overlay:update-config", updated)
+      } catch {}
+      setBindingKeybind(false)
+      toast.success(`Keybind set to ${getKeyName(data.keyCode)}`)
+    }
+
+    try {
+      window.electron.ipcRenderer.on("keybind:captured", handleKeybindCaptured)
+    } catch {}
+
+    return () => {
+      try {
+        window.electron.ipcRenderer.removeListener("keybind:captured", handleKeybindCaptured)
+      } catch {}
+    }
+  }, [])
 
   useEffect(() => {
     if (!navInitial) {
@@ -48,6 +91,18 @@ function Editor() {
     value: CrosshairConfig[K]
   ): void => {
     setConfig((c) => ({ ...c, [key]: value }))
+  }
+
+  const handleStartBindKeybind = async (): Promise<void> => {
+    setBindingKeybind(true)
+    await window.electron.ipcRenderer.invoke("keybind:start-binding")
+    toast.success("Press any key to bind it as the toggle hotkey...")
+  }
+
+  const handleClearKeybind = async (): Promise<void> => {
+    handleChange("toggleKeybind", null)
+    await window.electron.ipcRenderer.invoke("keybind:clear")
+    toast.success("Keybind cleared")
   }
 
   const save = async (): Promise<void> => {
@@ -268,6 +323,31 @@ function Editor() {
               />
             </div>
           )}
+
+          <div className="flex items-center justify-between border-t pt-4">
+            <div>
+              <Label>Toggle Keybind</Label>
+              <p className="text-sm text-muted-foreground mt-1">{getKeyName(config.toggleKeybind ?? null)}</p>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant={bindingKeybind ? "default" : "outline"}
+                onClick={handleStartBindKeybind}
+                disabled={bindingKeybind}
+                size="sm"
+              >
+                {bindingKeybind ? "Listening..." : "Bind Key"}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleClearKeybind}
+                disabled={config.toggleKeybind === null}
+                size="sm"
+              >
+                Reset
+              </Button>
+            </div>
+          </div>
         </CardContent>
       </Card>
 

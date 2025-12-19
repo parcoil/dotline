@@ -30,6 +30,7 @@ export type CrosshairConfig = {
   imageSize?: number
   onPress?: boolean
   waitTime?: number
+  toggleKeybind?: number | null
 }
 
 export type CrosshairLibraryItem = {
@@ -50,5 +51,6 @@ export const defaultConfig: CrosshairConfig = {
   imageUrl: "",
   imageSize: 32,
   onPress: false,
-  waitTime: 0
+  waitTime: 0,
+  toggleKeybind: null
 }

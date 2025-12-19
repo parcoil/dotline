@@ -11,6 +11,8 @@ import { CrosshairConfig, CrosshairStyle, defaultConfig } from "@/types/crosshai
 
 let uiohook: any = null
 let uiohookLoaded = false
+let currentToggleKeybind: number | null = null
+let isBindingKeybind = false
 
 let settingsWindow: BrowserWindow | null = null
 let overlayWindow: BrowserWindow | null = null
@@ -149,8 +151,37 @@ app.whenReady().then(() => {
           uiohook.on("mouseup", () => {
             overlayWindow?.webContents.send("overlay:mouse", { pressed: false })
           })
+
+          uiohook.on("keydown", (event: any) => {
+            try {
+              // If we're currently binding a keybind, capture it
+              if (isBindingKeybind) {
+                const capturedCode = event.keycode ?? event.rawcode ?? event.key
+                settingsWindow?.webContents.send("keybind:captured", { keyCode: capturedCode })
+                isBindingKeybind = false
+                return
+              }
+
+              // If the pressed key matches the toggle keybind, toggle the crosshair
+              const eventCode = event.keycode ?? event.rawcode
+              if (currentToggleKeybind !== null && eventCode === currentToggleKeybind) {
+                try {
+                  // Mirror global toggle: show/hide the overlay window itself
+                  if (overlayWindow?.isVisible()) {
+                    overlayWindow.hide()
+                  } else {
+                    overlayWindow?.showInactive()
+                  }
+                } catch (e) {
+                  console.error("Failed to toggle overlay window:", e)
+                }
+              }
+            } catch (err) {
+              console.error("Error in keydown handler:", err)
+            }
+          })
         }
-        
+
         uiohook.start()
         uiohookLoaded = true
       } else {
@@ -248,6 +279,7 @@ ipcMain.handle("overlay:hide", () => {
 })
 
 ipcMain.handle("overlay:update-config", (_event, config: CrosshairConfig) => {
+  currentToggleKeybind = config.toggleKeybind ?? null
   overlayWindow?.webContents.send("overlay:config", config)
   return true
 })
@@ -346,4 +378,19 @@ ipcMain.handle("config:import", async () => {
   } catch {
     return null
   }
+})
+
+ipcMain.handle("keybind:start-binding", () => {
+  isBindingKeybind = true
+  return true
+})
+
+ipcMain.handle("keybind:stop-binding", () => {
+  isBindingKeybind = false
+  return true
+})
+
+ipcMain.handle("keybind:clear", () => {
+  currentToggleKeybind = null
+  return true
 })

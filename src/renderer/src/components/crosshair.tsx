@@ -42,6 +42,7 @@ export function Crosshair({
   }
 
   const [pressed, setPressed] = useState(false)
+  const [toggledByKeybind, setToggledByKeybind] = useState(false)
   const waitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
@@ -83,6 +84,34 @@ export function Crosshair({
     }
   }, [config.onPress, config.waitTime, mode])
 
+  useEffect(() => {
+    if (mode === "embed") return
+
+    const keybindHandler = () => {
+      try {
+        // log receipt in renderer
+        // eslint-disable-next-line no-console
+        console.log("crosshair: overlay:toggle-keybind received in renderer")
+      } catch {}
+      setToggledByKeybind((prev) => !prev)
+    }
+
+    try {
+      // eslint-disable-next-line no-console
+      console.log("crosshair: registering listener for overlay:toggle-keybind")
+      window.electron.ipcRenderer.on("overlay:toggle-keybind", keybindHandler as any)
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("crosshair: failed to register toggle-keybind listener", err)
+    }
+
+    return () => {
+      try {
+        window.electron.ipcRenderer.removeListener("overlay:toggle-keybind", keybindHandler as any)
+      } catch {}
+    }
+  }, [mode])
+
   const style = useMemo(() => {
     const isEmbed = mode === "embed"
     const left = config.offsetX ?? 0
@@ -106,7 +135,29 @@ export function Crosshair({
         }
   }, [mode, config.offsetX, config.offsetY])
 
-  const visible = mode === "embed" ? config.enabled : config.enabled && (!config.onPress || pressed)
+  const visible = useMemo(() => {
+    if (mode === "embed") {
+      return config.enabled
+    }
+
+    // If toggled off by keybind, always hide
+    if (toggledByKeybind) {
+      return false
+    }
+
+    // If not toggled by keybind, check normal visibility
+    if (!config.enabled) {
+      return false
+    }
+
+    // If onPress is enabled, only show when pressed
+    if (config.onPress && !pressed) {
+      return false
+    }
+
+    return true
+  }, [mode, config.enabled, config.onPress, pressed, toggledByKeybind])
+
   if (!visible) return null
 
   const colorWithOpacity = hexToRgba(config.color, config.opacity)

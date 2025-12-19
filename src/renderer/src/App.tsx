@@ -55,7 +55,7 @@ function Overlay() {
     }
   }, [])
 
-  return <Crosshair config={config} />
+  return <Crosshair config={config} mode="overlay" />
 }
 
 function RoutedApp() {
