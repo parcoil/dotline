@@ -141,11 +141,6 @@ app.whenReady().then(() => {
       uiohook = mod.default?.uIOhook || mod.uIOhook
 
       if (uiohook) {
-        console.log("uiohook instance type:", uiohook.constructor.name)
-        console.log("uiohook own properties:", Object.getOwnPropertyNames(uiohook))
-        console.log("uiohook.on type:", typeof uiohook.on)
-        console.log("uiohook.start type:", typeof uiohook.start)
-
         if (typeof uiohook.on === "function") {
           uiohook.on("mousedown", () => {
             overlayWindow?.webContents.send("overlay:mouse", { pressed: true })
@@ -155,19 +150,9 @@ app.whenReady().then(() => {
             overlayWindow?.webContents.send("overlay:mouse", { pressed: false })
           })
         }
-
-        // Try different ways to start
-        if (typeof uiohook.start === "function") {
-          uiohook.start()
-          uiohookLoaded = true
-          console.log("uiohook-napi started with .start()")
-        } else if (typeof uiohook.run === "function") {
-          uiohook.run()
-          uiohookLoaded = true
-          console.log("uiohook-napi started with .run()")
-        } else {
-          console.warn("Could not find start/run method on uiohook")
-        }
+        
+        uiohook.start()
+        uiohookLoaded = true
       } else {
         console.warn("uiohook instance not found")
       }
