@@ -9,6 +9,7 @@ import Titlebar from "./components/titlebar"
 import Sidebar from "./components/sidebar"
 import Positioning from "./pages/positioning"
 import Settings from "./pages/settings"
+import packageJson from "../../../package.json"
 import {
   Dialog,
   DialogContent,
@@ -26,8 +27,8 @@ import {
   AlertDialogTitle
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
-import { Toaster } from "@/components/ui/sonner"
 import { toast } from "sonner"
+import { Toaster } from "@/components/ui/sonner"
 import { OverlayProvider } from "@/hooks/overlay"
 import { CrosshairConfigProvider } from "@/hooks/crosshair-config"
 
@@ -64,10 +65,28 @@ function RoutedApp() {
   const [downloadPercent, setDownloadPercent] = useState<number>(0)
   const isDownloaded = useMemo(() => downloadPercent >= 100, [downloadPercent])
   const [onboardingOpen, setOnboardingOpen] = useState(false)
+  const [patchNotesOpen, setPatchNotesOpen] = useState(false)
+  const [patchNotes, setPatchNotes] = useState("")
 
   useEffect(() => {
     const seen = localStorage.getItem("onboardingSeen")
     if (!seen) setOnboardingOpen(true)
+
+    const version = packageJson.version
+    fetch(`https://api.github.com/repos/Parcoil/dotline/releases/tags/v${version}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.body) {
+          const body = data.body
+          const stored = localStorage.getItem("patchNotes")
+          if (stored !== body) {
+            setPatchNotes(body)
+            setPatchNotesOpen(true)
+            localStorage.setItem("patchNotes", body)
+          }
+        }
+      })
+      .catch(() => {})
   }, [])
 
   const handleDismissOnboarding = () => {
@@ -175,19 +194,40 @@ function RoutedApp() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             {/* <Button
-              variant="outline"
-              onClick={() => {
-                try {
-                  window.open("https://github.com/Parcoil/dotline/issues/new/choose", "_blank")
-                } catch {}
-              }}
-            >
-              Report / Request
-            </Button> */}
+               variant="outline"
+               onClick={() => {
+                 try {
+                   window.open("https://github.com/Parcoil/dotline/issues/new/choose", "_blank")
+                 } catch {}
+               }}
+             >
+               Report / Request
+             </Button> */}
             <Button onClick={handleDismissOnboarding}>Got it</Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={patchNotesOpen} onOpenChange={() => {}}>
+        <DialogContent onInteractOutside={(e) => e.preventDefault()}>
+          <DialogHeader>
+            <DialogTitle>Patch Notes for v{packageJson.version}</DialogTitle>
+            <DialogDescription asChild>
+              <pre style={{ whiteSpace: "pre-wrap", fontFamily: "inherit" }}>{patchNotes}</pre>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              onClick={() => {
+                localStorage.setItem("patchNotes", patchNotes)
+                setPatchNotesOpen(false)
+              }}
+            >
+              OK
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <Toaster richColors closeButton />
     </div>
   )
