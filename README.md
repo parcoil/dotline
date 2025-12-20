@@ -19,7 +19,7 @@
 
 ### Tested Games
 
-#### All games where tested on Windows 11 24H2
+#### All games were tested on Windows 11 24H2
 
 - CS2 ✅
 - Rust ✅ (use Windowed fullscreen mode)
