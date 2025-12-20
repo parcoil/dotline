@@ -213,6 +213,9 @@ ipcMain.on("window-control", (event, action: "minimize" | "maximize" | "close") 
 })
 
 ipcMain.handle("overlay:show", () => {
+  overlayWindow?.setAlwaysOnTop(true, "screen-saver")
+  overlayWindow?.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+  overlayWindow?.setIgnoreMouseEvents(true, { forward: true })
   overlayWindow?.showInactive()
   return true
 })

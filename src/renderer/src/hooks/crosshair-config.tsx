@@ -1,5 +1,6 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from "react"
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react"
 import { CrosshairConfig, defaultConfig } from "../../../types/crosshair"
+import { useOverlayVisibility } from "./overlay"
 
 type CrosshairConfigContextValue = {
   config: CrosshairConfig
@@ -10,6 +11,7 @@ type CrosshairConfigContextValue = {
 const CrosshairConfigContext = createContext<CrosshairConfigContextValue | undefined>(undefined)
 
 export function CrosshairConfigProvider({ children }: { children: React.ReactNode }) {
+  const overlayContext = useOverlayVisibility()
   const [config, setConfigState] = useState<CrosshairConfig>(defaultConfig)
 
   useEffect(() => {
@@ -34,22 +36,25 @@ export function CrosshairConfigProvider({ children }: { children: React.ReactNod
       const newConfig = { ...c, enabled: !c.enabled }
       localStorage.setItem("currentConfig", JSON.stringify(newConfig))
       window.electron.ipcRenderer.invoke("overlay:update-config", newConfig).catch(() => {})
-      if (newConfig.enabled) {
-        window.electron.ipcRenderer.invoke("overlay:show").catch(() => {})
-      }
+      overlayContext.setEnabled(newConfig.enabled)
       return newConfig
     })
-  }, [])
+  }, [overlayContext])
+
+  const toggleEnabledRef = useRef(toggleEnabled)
+  useEffect(() => {
+    toggleEnabledRef.current = toggleEnabled
+  }, [toggleEnabled])
 
   useEffect(() => {
     const listener = () => {
-      toggleEnabled()
+      toggleEnabledRef.current()
     }
     window.electron.ipcRenderer.on("toggle-crosshair", listener)
     return () => {
       window.electron.ipcRenderer.removeListener("toggle-crosshair", listener)
     }
-  }, [toggleEnabled])
+  }, [])
 
   const value = React.useMemo<CrosshairConfigContextValue>(
     () => ({ config, setConfig, toggleEnabled }),
