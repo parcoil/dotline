@@ -243,7 +243,7 @@ function Editor() {
           {config.style === "image" && (
             <Card>
               <CardHeader>
-                <CardTitle>Image Settings</CardTitle>
+                <CardTitle>Image Settings (URL Recommended)</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
@@ -282,6 +282,10 @@ function Editor() {
                       Upload
                     </Button>
                   </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Note: Image URLs are recommended for better performance. Uploading will make the
+                    file bigger and slower to load. Use image URLs when possible.
+                  </p>
                 </div>
                 <div className="gap-3 flex flex-col">
                   <div className="flex justify-between">
