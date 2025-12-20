@@ -28,6 +28,7 @@ export type CrosshairConfig = {
   offsetY?: number
   imageUrl?: string
   imageSize?: number
+  hotkey?: string
 }
 
 export type CrosshairLibraryItem = {
@@ -46,5 +47,6 @@ export const defaultConfig: CrosshairConfig = {
   gap: 0,
   centerDot: false,
   imageUrl: "",
-  imageSize: 32
+  imageSize: 32,
+  hotkey: "CommandOrControl+Shift+X"
 }

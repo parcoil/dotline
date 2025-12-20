@@ -31,7 +31,11 @@ export function CrosshairConfigProvider({ children }: { children: React.ReactNod
     window.electron.ipcRenderer.invoke("overlay:update-config", newConfig).catch(() => {})
   }, [])
 
+  const lastToggle = useRef(0)
   const toggleEnabled = useCallback(() => {
+    const now = Date.now()
+    if (now - lastToggle.current < 500) return
+    lastToggle.current = now
     setConfigState((c) => {
       const newConfig = { ...c, enabled: !c.enabled }
       localStorage.setItem("currentConfig", JSON.stringify(newConfig))

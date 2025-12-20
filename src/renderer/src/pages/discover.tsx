@@ -190,7 +190,7 @@ function Discover() {
     <div className="space-y-8 px-4 md:px-0 max-w-[1200px] mx-auto">
       <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-1">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Discover Crosshairs</h1>
+          <h1 className="text-3xl font-bold">Discover Crosshairs</h1>
           <p className="text-muted-foreground">Manage your saved crosshairs or explore presets</p>
         </div>
 

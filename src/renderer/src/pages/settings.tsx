@@ -4,8 +4,11 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
+import { useCrosshairConfig } from "@/hooks/crosshair-config"
+import { HotkeyRecorder } from "@/components/ui/hotkey-recorder"
 
 function Settings() {
+  const { config, setConfig } = useCrosshairConfig()
   const [rpcEnabled, setRpcEnabled] = useState<boolean>(true)
   const [checking, setChecking] = useState(false)
 
@@ -44,8 +47,8 @@ function Settings() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-4">
-      <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+    <div className=" mx-auto space-y-4">
+      <h1 className="text-3xl font-bold ">Settings</h1>
 
       <Card>
         <CardHeader>
@@ -55,6 +58,21 @@ function Settings() {
           <div className="flex items-center justify-between">
             <Label>Enable Discord RPC</Label>
             <Switch checked={rpcEnabled} onCheckedChange={(v) => handleToggleRpc(!!v)} />
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Hotkey</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between">
+            <Label className="w-full">Toggle crosshair overlay</Label>
+            <HotkeyRecorder
+              value={config.hotkey || "CommandOrControl+Shift+X"}
+              onChange={(newHotkey) => setConfig({ ...config, hotkey: newHotkey })}
+            />
           </div>
         </CardContent>
       </Card>

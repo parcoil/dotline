@@ -12,6 +12,7 @@ import { CrosshairConfig, CrosshairStyle, defaultConfig } from "@/types/crosshai
 let settingsWindow: BrowserWindow | null = null
 let overlayWindow: BrowserWindow | null = null
 let currentOverlayDisplayId: number | null = null
+let currentHotkey = "CommandOrControl+Shift+X"
 
 function createSettingsWindow(): void {
   settingsWindow = new BrowserWindow({
@@ -109,8 +110,13 @@ function createOverlayWindow(): void {
       ? screen.getAllDisplays().find((d) => d.id === currentOverlayDisplayId)
       : screen.getPrimaryDisplay()
     if (!target) return
-    const { x: dx, y: dy, width: dw, height: dh } = target.bounds
-    overlayWindow.setBounds({ x: dx, y: dy, width: dw, height: dh })
+    const { x, y, width, height } = target.bounds
+    overlayWindow.setBounds({ x, y, width, height })
+    if (overlayWindow.isVisible()) {
+      overlayWindow.setAlwaysOnTop(true, "screen-saver")
+      overlayWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+      overlayWindow.setIgnoreMouseEvents(true, { forward: true })
+    }
   })
 }
 
@@ -132,7 +138,7 @@ app.whenReady().then(() => {
   createOverlayWindow()
 
   // Register global shortcut to toggle crosshair
-  globalShortcut.register("CommandOrControl+Shift+X", () => {
+  globalShortcut.register(currentHotkey, () => {
     console.log("Pressed")
     settingsWindow?.webContents.send("toggle-crosshair")
   })
@@ -227,6 +233,15 @@ ipcMain.handle("overlay:hide", () => {
 
 ipcMain.handle("overlay:update-config", (_event, config: CrosshairConfig) => {
   overlayWindow?.webContents.send("overlay:config", config)
+  const newHotkey = config.hotkey || "CommandOrControl+Shift+X"
+  if (newHotkey !== currentHotkey) {
+    globalShortcut.unregister(currentHotkey)
+    globalShortcut.register(newHotkey, () => {
+      console.log("Pressed")
+      settingsWindow?.webContents.send("toggle-crosshair")
+    })
+    currentHotkey = newHotkey
+  }
   return true
 })
 

@@ -142,7 +142,7 @@ function Editor() {
     <div className="max-w-7xl mx-auto space-y-4">
       <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Editor</h1>
+          <h1 className="text-3xl font-bold ">Editor</h1>
           <p className="text-sm text-muted-foreground mt-1">
             {editingExisting
               ? `Editing: ${editingItemName ?? "Saved crosshair"}`

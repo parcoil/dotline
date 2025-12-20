@@ -85,9 +85,9 @@ function Positioning(): React.ReactElement {
   }, [config])
 
   return (
-    <div className="max-w-3xl mx-auto space-y-4">
+    <div className=" mx-auto space-y-4">
       <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <h1 className="text-3xl font-bold tracking-tight">Positioning</h1>
+        <h1 className="text-3xl font-bold ">Positioning</h1>
         <div className="flex flex-wrap gap-3">
           <Button
             variant="outline"
