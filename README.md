@@ -30,7 +30,9 @@
 ### Supported OSes
 
 - Windows: ✅ (Tested on Windows 11 24H2)
-- Linux: ✅ (Tested on Arch Linux on KDE)
+- Linux: ✅ (Tested on the following distributions)
+    - Arch Linux on KDE
+    - CachyOs on KDE
 - MacOS ⚠️ (Seems to work. must build yourself, tested on MacOS sequoia)
 
 > [!WARNING]  
