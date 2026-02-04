@@ -17,9 +17,12 @@ export function HotkeyRecorder({
     if (e.shiftKey) modifiers.push("Shift")
     if (e.altKey) modifiers.push("Alt")
     if (e.metaKey) modifiers.push("Command")
-    const key = e.key
-    if (key && !["Control", "Shift", "Alt", "Meta"].includes(key)) {
-      const parts = [...modifiers, key.toUpperCase()]
+    let key = e.code
+    if (key && !["Control", "Shift", "Alt", "Meta", "Escape"].includes(key)) {
+      if (key.startsWith("Numpad")) {
+        key = key.replace("Numpad", "Num")
+      }
+      const parts = [...modifiers, key]
       const hotkey = parts.join("+")
       onChange(hotkey)
       setIsRecording(false)
@@ -32,6 +35,7 @@ export function HotkeyRecorder({
       .replace("Command", "Cmd")
       .replace("Alt", "Alt")
       .replace("Shift", "Shift")
+      .replace("Num", "Numpad ")
   }
 
   return (
