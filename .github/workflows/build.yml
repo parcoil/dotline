@@ -19,15 +19,11 @@ jobs:
         with:
           node-version: 22
 
-      - name: Setup Python (Windows only)
-        if: matrix.os == 'windows-latest'
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.x"
-
       - run: npm install -g pnpm
       - run: pnpm install
+        continue-on-error: true
 
+      # Build & Publish for electron-updater
       - run: pnpm run build
       - run: pnpm run dist -- --publish always
         env:
