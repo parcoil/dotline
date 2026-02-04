@@ -139,7 +139,7 @@ app.whenReady().then(() => {
 
   // Register global shortcut to toggle crosshair
   globalShortcut.register(currentHotkey, () => {
-    console.log("Pressed")
+    console.log("Hotkey Pressed")
     settingsWindow?.webContents.send("toggle-crosshair")
   })
 
@@ -237,7 +237,7 @@ ipcMain.handle("overlay:update-config", (_event, config: CrosshairConfig) => {
   if (newHotkey !== currentHotkey) {
     globalShortcut.unregister(currentHotkey)
     globalShortcut.register(newHotkey, () => {
-      console.log("Pressed")
+      console.log("Hotkey Pressed")
       settingsWindow?.webContents.send("toggle-crosshair")
     })
     currentHotkey = newHotkey
