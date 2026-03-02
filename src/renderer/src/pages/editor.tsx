@@ -16,6 +16,7 @@ import {
   SelectValue
 } from "@/components/ui/select"
 import { Crosshair } from "@/components/crosshair"
+import { ColorPicker } from "@/components/ui/color-picker"
 import { useLocation } from "react-router"
 import { toast } from "sonner"
 import { useCrosshairConfig } from "@/hooks/crosshair-config"
@@ -229,12 +230,10 @@ function Editor() {
 
               <div>
                 <Label htmlFor="color-picker">Color</Label>
-                <Input
-                  id="color-picker"
-                  type="color"
+                <ColorPicker
                   value={config.color}
-                  onChange={(e) => handleChange("color", e.target.value)}
-                  className="w-20 h-10 p-0 border-none cursor-pointer mt-1"
+                  onChange={(value) => handleChange("color", value)}
+                  className="mt-1"
                 />
               </div>
             </CardContent>
@@ -384,11 +383,10 @@ function Editor() {
                 <>
                   <div>
                     <Label>Outline Color</Label>
-                    <Input
-                      type="color"
+                    <ColorPicker
                       value={config.outlineColor ?? "#000000"}
-                      onChange={(e) => handleChange("outlineColor", e.target.value)}
-                      className="w-20 h-10 p-0 border-none cursor-pointer mt-1"
+                      onChange={(value) => handleChange("outlineColor", value)}
+                      className="mt-1"
                     />
                   </div>
 
@@ -453,11 +451,10 @@ function Editor() {
 
                   <div>
                     <Label>Center Dot Color</Label>
-                    <Input
-                      type="color"
+                    <ColorPicker
                       value={config.centerDotColor ?? config.color}
-                      onChange={(e) => handleChange("centerDotColor", e.target.value)}
-                      className="w-20 h-10 p-0 border-none cursor-pointer mt-1"
+                      onChange={(value) => handleChange("centerDotColor", value)}
+                      className="mt-1"
                     />
                   </div>
 
@@ -516,11 +513,10 @@ function Editor() {
                     <>
                       <div>
                         <Label>Center Dot Outline Color</Label>
-                        <Input
-                          type="color"
+                        <ColorPicker
                           value={config.centerDotOutlineColor ?? "#000000"}
-                          onChange={(e) => handleChange("centerDotOutlineColor", e.target.value)}
-                          className="w-20 h-10 p-0 border-none cursor-pointer mt-1"
+                          onChange={(value) => handleChange("centerDotOutlineColor", value)}
+                          className="mt-1"
                         />
                       </div>
 
