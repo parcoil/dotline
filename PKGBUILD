@@ -25,7 +25,7 @@ prepare() {
 
 build() {
     cd "$pkgname-$pkgver"
-    npm ci
+    npm i
     npm run build
     npx electron-builder --linux --dir
 }

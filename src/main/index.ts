@@ -140,7 +140,9 @@ app.whenReady().then(() => {
   // Register global shortcut to toggle crosshair
   globalShortcut.register(currentHotkey, () => {
     console.log("Hotkey Pressed")
-    settingsWindow?.webContents.send("toggle-crosshair")
+    if (settingsWindow && !settingsWindow.isDestroyed()) {
+      settingsWindow.webContents.send("toggle-crosshair")
+    }
   })
 
   // Initialize auto updater and perform a background check
@@ -219,26 +221,34 @@ ipcMain.on("window-control", (event, action: "minimize" | "maximize" | "close") 
 })
 
 ipcMain.handle("overlay:show", () => {
-  overlayWindow?.setAlwaysOnTop(true, "screen-saver")
-  overlayWindow?.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
-  overlayWindow?.setIgnoreMouseEvents(true, { forward: true })
-  overlayWindow?.showInactive()
+  if (overlayWindow && !overlayWindow.isDestroyed()) {
+    overlayWindow.setAlwaysOnTop(true, "screen-saver")
+    overlayWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+    overlayWindow.setIgnoreMouseEvents(true, { forward: true })
+    overlayWindow.showInactive()
+  }
   return true
 })
 
 ipcMain.handle("overlay:hide", () => {
-  overlayWindow?.hide()
+  if (overlayWindow && !overlayWindow.isDestroyed()) {
+    overlayWindow.hide()
+  }
   return true
 })
 
 ipcMain.handle("overlay:update-config", (_event, config: CrosshairConfig) => {
-  overlayWindow?.webContents.send("overlay:config", config)
+  if (overlayWindow && !overlayWindow.isDestroyed()) {
+    overlayWindow.webContents.send("overlay:config", config)
+  }
   const newHotkey = config.hotkey || "CommandOrControl+Shift+X"
   if (newHotkey !== currentHotkey) {
     globalShortcut.unregister(currentHotkey)
     globalShortcut.register(newHotkey, () => {
       console.log("Hotkey Pressed")
-      settingsWindow?.webContents.send("toggle-crosshair")
+      if (settingsWindow && !settingsWindow.isDestroyed()) {
+        settingsWindow.webContents.send("toggle-crosshair")
+      }
     })
     currentHotkey = newHotkey
   }
@@ -261,7 +271,7 @@ ipcMain.handle("overlay:list-displays", () => {
 ipcMain.handle("overlay:set-display", (_event, displayId: number) => {
   const displays = screen.getAllDisplays()
   const target = displays.find((d) => d.id === displayId)
-  if (!overlayWindow || !target) return false
+  if (!overlayWindow || overlayWindow.isDestroyed() || !target) return false
   const { x, y, width, height } = target.bounds
   overlayWindow.setBounds({ x, y, width, height })
   overlayWindow.setAlwaysOnTop(true, "screen-saver")
@@ -273,7 +283,7 @@ ipcMain.handle("overlay:set-display", (_event, displayId: number) => {
 })
 
 ipcMain.handle("overlay:get-display", () => {
-  if (!overlayWindow) return null
+  if (!overlayWindow || overlayWindow.isDestroyed()) return null
   const bounds = overlayWindow.getBounds()
   const displays = screen.getAllDisplays()
   const target = displays.find(
